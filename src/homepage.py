@@ -3,9 +3,8 @@ import requests
 
 app = Flask(__name__)
 
-# Kroger API credentials (replace with your actual credentials)
-CLIENT_ID = 'your_client_id'
-CLIENT_SECRET = 'your_client_secret'
+CLIENT_ID = 'bagandbyte-2432612430342431786a6a7a4144667543456c792f4433472f6f4f5965785957433762597543636d5752524f6b5554766233664f67703648413533654135037845033016591'
+CLIENT_SECRET = 'Yb24nJQRFG8yS73ivzSwTES9cBTfGe39UsjHgEAQ'
 
 def get_kroger_token():
     url = 'https://api.kroger.com/v1/connect/oauth2/token'
