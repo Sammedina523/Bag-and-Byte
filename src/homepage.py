@@ -43,7 +43,7 @@ def homepage():
     beverages = fetch_products(token, 'beverages', limit=5)
 
     # Pass all products to the template
-    return render_template('homepage.html', fruits=fruits, vegetables=vegetables, beverages=beverages)
+    return render_template('index.html', fruits=fruits, vegetables=vegetables, beverages=beverages)
 
 if __name__ == '__main__':
     app.run(debug=True)
