@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-# Replace hese with your actual Kroger API credentials
+# Replace these with your actual Kroger API credentials
 CLIENT_ID = 'bagandbyte-2432612430342431786a6a7a4144667543456c792f4433472f6f4f5965785957433762597543636d5752524f6b5554766233664f67703648413533654135037845033016591'
 CLIENT_SECRET = 'Yb24nJQRFG8yS73ivzSwTES9cBTfGe39UsjHgEAQ'
 
