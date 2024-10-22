@@ -4,7 +4,7 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 # Set up Flask app and SQLAlchemy
-app = Flask(__name_)
+app = Flask(__name__)
 
 # PostgreSQL configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://grocery_user:csc190@localhost/grocery_db'
