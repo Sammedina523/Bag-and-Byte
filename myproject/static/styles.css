@@ -8,30 +8,81 @@ body {
 header {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
+    align-items: center;
+    padding: 10px 20px;
     background-color: #f8f8f8;
-    border-bottom: 2px solid #ccc;
+    border-bottom: 1px solid #ccc;
 }
 
 .logo img {
-    height: 50px;
+    height: 40px;
+}
+
+.search-bar-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 5px;
+    width: 60%;
 }
 
 .search-bar input {
-    width: 300px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    width: 100%;
+    outline: none;
+    border-radius: 20px;
 }
 
-.login-signup button {
-    padding: 10px 20px;
-    margin-left: 10px;
+.search-bar button {
+    background-color: transparent;
     border: none;
-    background-color: #5bc0de;
-    color: white;
-    border-radius: 5px;
     cursor: pointer;
+    padding-left: 10px;
+}
+
+.login-signup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px; /* Adjust space between search and buttons */
+}
+
+.login-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    text-align: center;
+    line-height: normal; /* Ensures proper text alignment */
+}
+
+.signup-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 15px; /* Adjusted padding to make the button smaller */
+    border-radius: 20px;
+    cursor: pointer;
+    text-align: center;
+    line-height: normal;
+    display: inline-block;
+    white-space: nowrap; /* Ensures text stays in one line */
+    font-size: 14px; /* Reduce the font size slightly if needed */
+}
+
+.signup-btn:hover, .login-btn:hover {
+    opacity: 0.9;
 }
 
 .banner {
@@ -96,3 +147,28 @@ h2 {
     color: #333;
 }
 
+/* Refresh button styling */
+.refresh-button {
+    background-color: #5bc0de;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.refresh-button i {
+    margin-right: 8px;
+}
+
+.refresh-button:hover {
+    opacity: 0.9;
+}
+
+/* Placeholder styling */
+.placeholder {
+    opacity: 0.5;
+}

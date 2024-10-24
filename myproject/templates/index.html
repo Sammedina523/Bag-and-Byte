@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Grocery Shop</title>
 </head>
 <body>
@@ -12,47 +13,83 @@
             <div class="logo">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
             </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search for your groceries...">
-            </div>
-            <div class="login-signup">
-                <!-- Link the login button to the login route -->
-                <a href="{{ url_for('login') }}"><button>Sign in</button></a>
-                <button>Sign Up</button>
+            <div class="search-bar-container">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for your groceries...">
+                    <button class="search-button"><i class="fa fa-search"></i></button>
+                </div>
+                <div class="login-signup">
+                    <a href="{{ url_for('login') }}"><button class="login-btn">Login</button></a>
+                    <button class="signup-btn">Sign Up</button>
+                </div>
             </div>
         </div>
     </header>
 
     <main>
         <div class="banner">
-            <h1>Come and grab a byte tonite</h1>
+            <h1>Come and grab a byte tonyte</h1>
             <p>From a variety of fresh products</p>
             <button>Start Shopping</button>
         </div>
 
         <section class="deals">
             <h2>Weekly Deals</h2>
+            <!-- Add the refresh button -->
+            <button class="refresh-button" onclick="refreshDeals()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
             <div class="products">
+                {% set total_deals = weekly_deals['data'][:4] %}
+                {% for deal in total_deals %}
                 <div class="product">
-                    <img src="{{ url_for('static', filename='product.png') }}" alt="Product">
-                    <p>Product Name 1</p>
-                    <p>$X.XX</p>
+                    <img src="{{ deal['images'][0]['sizes'][0]['url'] }}" alt="{{ deal['description'] }}">
+                    <p>{{ deal['description'] }}</p>
+                    {% if deal['items'] and 'price' in deal['items'][0] %}
+                        <p>${{ deal['items'][0]['price']['regular'] }}</p>
+                    {% else %}
+                        <p>Price not available</p>
+                    {% endif %}
                 </div>
-                <!-- Repeat for more products -->
+                {% endfor %}
+                <!-- If there are less than 4 deals, fill the rest with placeholders -->
+                {% for _ in range(4 - total_deals|length) %}
+                <div class="product placeholder">
+                    <img src="{{ url_for('static', filename='product.png') }}" alt="Product Placeholder">
+                    <p>Product coming soon</p>
+                    <p>Price not available</p>
+                </div>
+                {% endfor %}
             </div>
         </section>
-
+        
         <section class="seasonal">
             <h2>Seasonal Items</h2>
             <div class="products">
+                {% for item in seasonal_items['data'] %}
                 <div class="product">
-                    <img src="{{ url_for('static', filename='product.png') }}" alt="Product">
-                    <p>Product Name 2</p>
-                    <p>$X.XX</p>
+                    <img src="{{ item['images'][0]['sizes'][0]['url'] }}" alt="{{ item['description'] }}">
+                    <p>{{ item['description'] }}</p>
+                    {% if item['items'] and 'price' in item['items'][0] %}
+                        <p>${{ item['items'][0]['price']['regular'] }}</p>
+                    {% else %}
+                        <p>Price not available</p>
+                    {% endif %}
                 </div>
-                <!-- Repeat for more products -->
+                {% endfor %}
             </div>
-        </section>
+        </section>   
     </main>
+
+    <!-- Add JavaScript function for refreshing -->
+    <script>
+        function refreshDeals() {
+            fetch('{{ url_for('index') }}')  // Change 'index' to your API call route
+            .then(response => response.text())
+            .then(data => {
+                document.body.innerHTML = data;
+            });
+        }
+    </script>
 </body>
 </html>
