@@ -1,11 +1,3 @@
-import sys
-import os
-
-# Add the 'src' directory to the system path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
-
-from kroger import get_access_token, search_products
-
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 
@@ -31,19 +23,6 @@ def login():
             return redirect(url_for('login'))  # Redirect back to login on failure
 
     return render_template('login.html')
-
-#integrating API into homepage
-@app.route('/')
-def home():
-    token = get_access_token()  # Get the access token from the Kroger API
-
-    # Use search_products to get weekly deals and seasonal items
-    weekly_deals = search_products(token, 'weekly deals')  # Replace 'weekly deals' with the actual search term you want
-    seasonal_items = search_products(token, 'seasonal items')  # Replace 'seasonal items' with the actual search term you want
-
-    # Pass the fetched data to the template
-    return render_template('index.html', weekly_deals=weekly_deals, seasonal_items=seasonal_items)
-
 
 # Existing route for the index (main home page after login)
 @app.route('/')
