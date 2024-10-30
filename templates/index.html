@@ -50,34 +50,8 @@
             <h1>Come and grab a byte tonyte</h1>
             <p>From a variety of fresh products</p>
         </div>
-
-        <section class="deals">
-            <h2>Product Categories</h2>
-            <div class="products">
-                {% set total_deals = weekly_deals['data'][:4] %}
-                {% for deal in total_deals %}
-                <div class="product">
-                    <img src="{{ deal['images'][0]['sizes'][0]['url'] }}" alt="{{ deal['description'] }}">
-                    <p>{{ deal['description'] }}</p>
-                    {% if deal['items'] and 'price' in deal['items'][0] %}
-                        <p>${{ deal['items'][0]['price']['regular'] }}</p>
-                    {% else %}
-                        <p>Price not available</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                <!-- If there are less than 4 deals, fill the rest with placeholders -->
-                {% for _ in range(4 - total_deals|length) %}
-                <div class="product placeholder">
-                    <img src="{{ url_for('static', filename='product.png') }}" alt="Product Placeholder">
-                    <p>Product coming soon</p>
-                    <p>Price not available</p>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
         
-        <section class="seasonal">
+        <section class="seasonal items">
             <h2>Seasonal Items</h2>
             <div class="products">
                 {% for item in seasonal_items['data'][:8] %}
@@ -112,8 +86,6 @@
                   }).catch(error => console.error('Error:', error));
             }
         </script> 
-    </main>
-        </section> 
     </main>
 </body>
 </html>
