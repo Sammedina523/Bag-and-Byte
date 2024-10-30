@@ -51,42 +51,20 @@ def search_products(token, query):
         print(f"Failed to fetch products: {response.status_code}, {response.text}")
         return None
 
-def display_products_with_images(products):
-    for product in products['data']:
-        product_id = product['productId']
-        name = product['description']
-
-        # Check for images and get the first available image (front perspective)
-        image_url = None
-        if 'images' in product and len(product['images']) > 0:
-            for image in product['images']:
-                if image['perspective'] == 'front':  # Use front-facing image
-                    if len(image['sizes']) > 0:
-                        image_url = image['sizes'][0]['url']  # Fetch the URL of the first size available
-                    break
-
-        print(f"Product ID: {product_id}")
-        print(f"Name: {name}")
-        if image_url:
-            print(f"Image URL: {image_url}")
-        else:
-            print("No image available.")
-        print("-" * 40)
-
-
-
-# Main code to test the API
+# Main code to test the seasonal search function
 if __name__ == "__main__":
     # Step 1: Get Access Token
     token = get_access_token()
     if token:
-        print(f"Access token: {token}")
 
-        # Step 2: Search for products (e.g., search for "milk")
-        products = search_products(token, 'milk')
-        if products:
-             display_products_with_images(products)
+        # Step 2: Search for seasonal items
+        seasonal_items = search_products(token, query='')
+        if seasonal_items:
+            # Display the seasonal items
+            print("Seasonal Items Found:")
+            for item in seasonal_items.get('data', []):
+                print(f"Product ID: {item.get('productId')}, Name: {item.get('description')}")
         else:
-            print("No products found or an error occurred.")
+            print("No seasonal items found or an error occurred.")
     else:
         print("Failed to get access token.")

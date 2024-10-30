@@ -48,11 +48,10 @@ def index():
     token = get_access_token()  # Get the access token from the Kroger API
 
     # Use search_products to get weekly deals and seasonal items
-    weekly_deals = search_products(token, 'weekly deals')
-    seasonal_items = search_products(token, 'seasonal items')
+    seasonal_items = search_products(token, 'chips')
 
     # Pass the fetched data to the template
-    return render_template('index.html', weekly_deals=weekly_deals, seasonal_items=seasonal_items)
+    return render_template('index.html', seasonal_items=seasonal_items)
 
 if __name__ == "__main__":
     app.run(debug=True)
