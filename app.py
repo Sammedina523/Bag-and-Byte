@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+from src.kroger import get_access_token, search_products
 
 
 app = Flask(__name__)
@@ -27,7 +28,14 @@ def login():
 # Existing route for the index (main home page after login)
 @app.route('/')
 def index():
-    return render_template('index.html') 
+    token = get_access_token()  # Get the access token from the Kroger API
+
+    # Use search_products to get weekly deals and seasonal items
+    weekly_deals = search_products(token, 'weekly deals')  # Replace 'weekly deals' with the actual search term you want
+    seasonal_items = search_products(token, 'seasonal items')  # Replace 'seasonal items' with the actual search term you want
+
+    # Pass the fetched data to the template
+    return render_template('index.html', weekly_deals=weekly_deals, seasonal_items=seasonal_items)
 
 if __name__ == "__main__":
     app.run(debug=True)
