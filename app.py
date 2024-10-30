@@ -1,29 +1,46 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from src.kroger import get_access_token, search_products
-
+from kroger import get_access_token, search_products
+from database import add_user, get_user, verify_password
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
 
-# Mock user database (for demonstration purposes)
-users = {'user@hofstra.edu': 'hofstra'}
+# Route for user registration
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
 
-# Route for the login screen
+        if add_user(email, password):
+            flash('Registration successful! You can now log in.', 'success')
+            return redirect(url_for('login'))  # Redirect to login after successful registration
+        else:
+            flash('User already exists, please choose a different email.', 'danger')  # Error message
+
+    return render_template('register.html')
+
+
+# route for login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
 
-        # Simple check for a mock user (replace with real database logic later)
-        if email in users and users[email] == password:
-            flash('Login successful!', 'success')
+        # Retrieve the stored hashed password from the database
+        stored_password = get_user(email)
+
+        # Check if the user exists and if the provided password matches the stored hash
+        if stored_password and verify_password(stored_password, password):
+            flash('Login successful!', 'success')  # Success message
             return redirect(url_for('index'))  # Redirect to home/dashboard page
         else:
-            flash('Invalid email or password', 'danger')
+            flash('Invalid email or password.', 'danger')  # Error message
             return redirect(url_for('login'))  # Redirect back to login on failure
 
     return render_template('login.html')
+
 
 # Existing route for the index (main home page after login)
 @app.route('/')
@@ -31,8 +48,8 @@ def index():
     token = get_access_token()  # Get the access token from the Kroger API
 
     # Use search_products to get weekly deals and seasonal items
-    weekly_deals = search_products(token, 'weekly deals')  # Replace 'weekly deals' with the actual search term you want
-    seasonal_items = search_products(token, 'seasonal items')  # Replace 'seasonal items' with the actual search term you want
+    weekly_deals = search_products(token, 'weekly deals')
+    seasonal_items = search_products(token, 'seasonal items')
 
     # Pass the fetched data to the template
     return render_template('index.html', weekly_deals=weekly_deals, seasonal_items=seasonal_items)

@@ -19,9 +19,13 @@
                     <button class="search-button"><i class="fa fa-search"></i></button>
                 </div>
                 <div class="login-signup">
-                    <a href="{{ url_for('login') }}"><button class="login-btn">Login</button></a>
-                    <button class="signup-btn">Sign Up</button>
-                </div>
+                    <a href="{{ url_for('login') }}">
+                        <button class="login-btn">Login</button>
+                    </a>
+                    <a href="{{ url_for('register') }}">
+                        <button class="signup-btn">Sign Up</button>
+                    </a>
+                </div>                
             </div>
         </div>
     </header>
