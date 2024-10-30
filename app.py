@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from kroger import get_access_token, search_products
 from database import add_user, get_user, verify_password
 
@@ -20,6 +20,52 @@ def register():
 
     return render_template('register.html')
 
+#cart page
+
+# Initialize cart function
+def initialize_cart():
+    if 'cart' not in session:
+        session['cart'] = {}
+
+# Route to add items to cart
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    initialize_cart()
+    cart = session['cart']
+
+    # Get product data from JSON request body
+    data = request.get_json()
+    name = data['name']
+    price = data['price']
+    
+    # Use the product name as a unique key in the cart
+    if name in cart:
+        cart[name]['quantity'] += 1
+    else:
+        cart[name] = {
+            "name": name,
+            "price": price,
+            "quantity": 1
+        }
+    
+    # Update session
+    session['cart'] = cart
+    session.modified = True
+    
+    return jsonify({"message": f"{name} has been added to your cart!"})
+
+# Route to view cart
+@app.route('/cart')
+def view_cart():
+    initialize_cart()
+    cart = session['cart']
+    
+    # Calculate total price
+    total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+    return render_template('cart.html', cart=cart, total_price=total_price)
+
+
+    #cart end
 
 # route for login page
 @app.route('/login', methods=['GET', 'POST'])
