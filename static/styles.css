@@ -195,3 +195,13 @@ h2 {
     background-color: #3f3f3f; /* Slightly lighter grey on hover */
     opacity: 0.9; /* Slightly transparent on hover */
 }
+
+/* Specific styles for logo text and banner heading */
+.logo-text {
+    font-family: 'Courier New', Courier, monospace; /* Ensures the same font is used */
+}
+
+/* Button styles */
+.login-btn, .signup-btn, .btn-primary, .btn-secondary {
+    font-family: 'Courier New', Courier, monospace; /* Same font for buttons */
+}
