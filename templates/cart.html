@@ -5,7 +5,6 @@
     <title>Shopping Cart</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Inline styling for the cart layout */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -29,6 +28,32 @@
         .cart-container h1 {
             font-size: 24px;
             margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .cart-item input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+
+        .cart-item .remove-button {
+            color: #d9534f;
+            cursor: pointer;
+        }
+
+        .cart-item .remove-button:hover {
+            text-decoration: underline;
+        }
+
+        .total-price {
+            font-weight: bold;
+            margin-top: 20px;
         }
 
         .empty-message {
@@ -56,47 +81,28 @@
         .browse-button:hover {
             background-color: #218838;
         }
-        
-        .cart-item {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        
-        .remove-button {
-            color: #d9534f;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        
-        .remove-button:hover {
-            text-decoration: underline;
-        }
     </style>
     <script>
-        async function removeFromCart(productId) {
-            const response = await fetch(`/remove_from_cart/${productId}`, { method: 'POST' });
+        async function updateCartItem(name, quantity) {
+            const response = await fetch('/update_cart', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: name, quantity: parseInt(quantity) })
+            });
             const data = await response.json();
-            
-            // Update the cart dynamically based on the response data
-            const cartContainer = document.getElementById('cart-container');
-            if (data.cart.length === 0) {
-                cartContainer.innerHTML = `
-                    <p class="empty-message">Your cart is empty...</p>
-                    <p class="browse-message">Start browsing!</p>
-                    <a href="{{ url_for('index') }}" class="browse-button">Browse</a>
-                `;
-            } else {
-                let cartItems = '';
-                data.cart.forEach(item => {
-                    cartItems += `
-                        <div class="cart-item">
-                            ${item.name} - $${item.price} x ${item.quantity}
-                            <span class="remove-button" onclick="removeFromCart(${item.id})">Remove</span>
-                        </div>
-                    `;
-                });
-                cartContainer.innerHTML = cartItems + `<p>Total: $${data.total_price}</p>`;
-            }
+            alert(data.message);  // Show a message to the user (optional)
+            location.reload();    // Reload to update the cart view
+        }
+
+        async function removeFromCart(name) {
+            const response = await fetch('/remove_from_cart', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: name })
+            });
+            const data = await response.json();
+            alert(data.message);  // Show a message to the user (optional)
+            location.reload();    // Reload to update the cart view
         }
     </script>
 </head>
@@ -105,16 +111,19 @@
         <h1>Your Cart</h1>
         
         {% if cart %}
-            <!-- Show items in the cart -->
+            <!-- Display cart items -->
             <div id="cart-items">
-                {% for product_id, item in cart.items() %}
+                {% for item in cart %}
                     <div class="cart-item">
-                        {{ item.name }} - ${{ item.price }} x {{ item.quantity }}
-                        <span class="remove-button" onclick="removeFromCart({{ product_id }})">Remove</span>
+                        <span>{{ item[0] }} - ${{ item[1] }}</span>
+                        <div>
+                            <input type="number" min="1" value="{{ item[2] }}" onchange="updateCartItem('{{ item[0] }}', this.value)">
+                            <span class="remove-button" onclick="removeFromCart('{{ item[0] }}')">Remove</span>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
-            <p>Total: ${{ total_price }}</p>
+            <p class="total-price">Total: ${{ total_price }}</p>
         {% else %}
             <!-- Empty cart layout -->
             <p class="empty-message">Your cart is empty...</p>
