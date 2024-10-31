@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from kroger import get_access_token, search_products
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart
+from database import (
+    add_user, get_user, verify_password, 
+    add_to_cart_db, update_cart_item, delete_cart_item, 
+    get_cart, get_products
+)
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
@@ -99,16 +102,14 @@ def login():
 
     return render_template('login.html')
 
-# Existing route for the index (main home page after login)
+# Home page route, now retrieves products from the database
 @app.route('/')
 def index():
-    token = get_access_token()  # Get the access token from the Kroger API
+    # Get products from the database
+    products = get_products()
 
-    # Use search_products to get weekly deals and seasonal items
-    seasonal_items = search_products(token, 'halloween')
-
-    # Pass the fetched data to the template
-    return render_template('index.html', seasonal_items=seasonal_items)
+    # Pass the products to the template
+    return render_template('index.html', products=products)
 
 if __name__ == "__main__":
     app.run(debug=True)
