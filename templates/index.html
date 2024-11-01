@@ -8,22 +8,31 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Bag & Byte | Home</title>
     <style>
-        /* Center the Home title */
-        .page-title-container {
+        /* Category bar styling */
+        .category-bar {
+            background-color: #f8f9fa;
+            padding: 10px 0;
             text-align: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
         }
-        
-        .page-title {
-            font-size: 2em;
+
+        .category-bar a {
+            margin: 0 15px;
+            color: #333;
+            font-size: 1em;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .category-bar a.active {
+            color: #28a745;
         }
 
         /* Flex container for horizontal layout with wrapping */
         .products-list {
             display: flex;
-            flex-wrap: wrap; /* Allow wrapping to new rows if needed */
-            gap: 20px; /* Space between items */
+            flex-wrap: wrap;
+            gap: 20px;
             justify-content: center;
             padding: 20px;
         }
@@ -97,17 +106,20 @@
         </div>
     </header>
 
+    <!-- Category bar -->
+    <nav class="category-bar">
+        <a href="{{ url_for('index') }}" class="{{ 'active' if current_category == 'All' else '' }}">All</a>
+        {% for category in categories %}
+            <a href="{{ url_for('index', category=category) }}" class="{{ 'active' if current_category == category else '' }}">{{ category }}</a>
+        {% endfor %}
+    </nav>
+
     <main>
         <div class="banner">
             <h1>Come and grab a byte tonyte</h1>
             <p>From a variety of fresh products</p>
         </div>
         
-        <!-- Centered Home title -->
-        <div class="page-title-container">
-            <h2 class="page-title">Home</h2>
-        </div>
-
         <section class="products">
             <div class="products-list">
                 {% for product in products %}

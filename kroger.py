@@ -30,7 +30,7 @@ def get_access_token():
         print(f"Failed to get access token: {response.status_code}, {response.text}")
         return None
 
-# Step 2: Search for Products Using Kroger API
+# Step 2: Search for Products Using Kroger API and Extract Category
 def search_products(token, query):
     headers = {
         'Authorization': f'Bearer {token}',
@@ -46,24 +46,42 @@ def search_products(token, query):
     response = requests.get(PRODUCT_API_URL, headers=headers, params=params)
 
     if response.status_code == 200:
-        return response.json()
+        products = response.json()
+        
+        # Check sample data structure for category fields
+        if 'data' in products and products['data']:
+            print("Sample Product Data:", products['data'][0])  # Print to inspect category field structure
+
+        return products
     else:
         print(f"Failed to fetch products: {response.status_code}, {response.text}")
         return None
 
-# Main code to test the seasonal search function
+# Step 3: Extract Categories from Product Data (if categories are present)
+def extract_categories(products_data):
+    categories = set()
+    for product in products_data.get('data', []):
+        # Replace 'category_field_path' with the actual key where category information is stored
+        category = product.get('categories', ["Uncategorized"])[0]  # Assuming 'categories' is a list in the response
+        if category:
+            categories.add(category)
+    return list(categories)
+
+# Main code to test category extraction and seasonal search function
 if __name__ == "__main__":
     # Step 1: Get Access Token
     token = get_access_token()
     if token:
-
-        # Step 2: Search for seasonal items
-        seasonal_items = search_products(token, query='')
+        # Step 2: Search for seasonal items and extract categories
+        seasonal_items = search_products(token, query='halloween')
         if seasonal_items:
-            # Display the seasonal items
             print("Seasonal Items Found:")
             for item in seasonal_items.get('data', []):
                 print(f"Product ID: {item.get('productId')}, Name: {item.get('description')}")
+
+            # Step 3: Extract and display categories
+            categories = extract_categories(seasonal_items)
+            print("Available Categories:", categories)
         else:
             print("No seasonal items found or an error occurred.")
     else:

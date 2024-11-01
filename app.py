@@ -1,9 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import (
-    add_user, get_user, verify_password, 
-    add_to_cart_db, update_cart_item, delete_cart_item, 
-    get_cart, get_products
-)
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
@@ -17,9 +13,9 @@ def register():
 
         if add_user(email, password):
             flash('Registration successful! You can now log in.', 'success')
-            return redirect(url_for('login'))  # Redirect to login after successful registration
+            return redirect(url_for('login'))
         else:
-            flash('User already exists, please choose a different email.', 'danger')  # Error message
+            flash('User already exists, please choose a different email.', 'danger')
 
     return render_template('register.html')
 
@@ -28,7 +24,7 @@ def register():
 def add_to_cart():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 403
-    
+
     user_id = session['user_id']
     data = request.get_json()
     product_name = data['name']
@@ -42,7 +38,7 @@ def add_to_cart():
 def update_cart():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 403
-    
+
     user_id = session['user_id']
     data = request.get_json()
     product_name = data['name']
@@ -60,7 +56,7 @@ def update_cart():
 def remove_from_cart():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 403
-    
+
     user_id = session['user_id']
     data = request.get_json()
     product_name = data['name']
@@ -74,11 +70,11 @@ def view_cart():
     if 'user_id' not in session:
         flash('Please log in to view your cart', 'danger')
         return redirect(url_for('login'))
-    
+
     user_id = session['user_id']
     cart_items = get_cart(user_id)
     total_price = sum(item[1] * item[2] for item in cart_items)
-    
+
     return render_template('cart.html', cart=cart_items, total_price=total_price)
 
 # Route for user login
@@ -88,28 +84,25 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        # Retrieve the stored hashed password from the database
         stored_password = get_user(email)
 
-        # Check if the user exists and if the provided password matches the stored hash
         if stored_password and verify_password(stored_password, password):
-            session['user_id'] = email  # Store user identifier in session
-            flash('Login successful!', 'success')  # Success message
-            return redirect(url_for('index'))  # Redirect to home/dashboard page
+            session['user_id'] = email
+            flash('Login successful!', 'success')
+            return redirect(url_for('index'))
         else:
-            flash('Invalid email or password.', 'danger')  # Error message
-            return redirect(url_for('login'))  # Redirect back to login on failure
+            flash('Invalid email or password.', 'danger')
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
-# Home page route, now retrieves products from the database
+# Route to display products with optional category filtering
 @app.route('/')
-def index():
-    # Get products from the database
-    products = get_products()
-
-    # Pass the products to the template
-    return render_template('index.html', products=products)
+@app.route('/category/<string:category>')
+def index(category="All"):
+    categories = get_categories()  # Fetch all available categories from the database
+    products = get_products(category=category)  # Fetch products filtered by the selected category
+    return render_template('index.html', categories=categories, products=products, current_category=category)
 
 if __name__ == "__main__":
     app.run(debug=True)

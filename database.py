@@ -81,16 +81,19 @@ def get_cart(user_id):
 def create_products_table():
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
+    cursor.execute('DROP TABLE IF EXISTS products')  # Drop the existing table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS products (
             product_id TEXT PRIMARY KEY,
             name TEXT,
             price REAL,
-            image_url TEXT
+            image_url TEXT,
+            category TEXT
         )
     ''')
     conn.commit()
     conn.close()
+
 
 def fetch_and_store_products(query=''):
     # Step 1: Get access token using kroger.py
@@ -113,30 +116,51 @@ def fetch_and_store_products(query=''):
         name = product.get('description')
         price = product['items'][0].get('price', {}).get('regular') if product.get('items') else None
         image_url = product['images'][0]['sizes'][0]['url'] if product.get('images') else None
+        # Extract category - assuming the category is located in `categories` field as a list
+        category = product.get('categories', ["Uncategorized"])[0]  # Adjust if necessary
 
         # Insert or replace product information in the products table
         cursor.execute('''
-            INSERT OR REPLACE INTO products (product_id, name, price, image_url)
-            VALUES (?, ?, ?, ?)
-        ''', (product_id, name, price, image_url))
+            INSERT OR REPLACE INTO products (product_id, name, price, image_url, category)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (product_id, name, price, image_url, category))
 
     conn.commit()
     conn.close()
     print("Products have been successfully stored in the database.")
 
-def get_products():
+def get_products(category=None):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT product_id, name, price, image_url FROM products')
+    
+    if category and category != 'All':
+        cursor.execute('SELECT product_id, name, price, image_url FROM products WHERE category = ?', (category,))
+    else:
+        cursor.execute('SELECT product_id, name, price, image_url FROM products')
+        
     products = cursor.fetchall()
     conn.close()
     return [{'product_id': row[0], 'name': row[1], 'price': row[2], 'image_url': row[3]} for row in products]
+
+# Function to get all unique categories from products table
+def get_categories():
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT DISTINCT category FROM products')
+    categories = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return categories
 
 # Initialize tables if running this file
 if __name__ == "__main__":
     create_cart_table()
     create_products_table()
     print("Cart and products tables created successfully.")
-    fetch_and_store_products(query="seasonal")
-    fetch_and_store_products(query="vegetables")
+    fetch_and_store_products(query="candy")
+    fetch_and_store_products(query="produce")
+    fetch_and_store_products(query="fruits")
+    fetch_and_store_products(query="dairy")
+    fetch_and_store_products(query="frozen")
+    fetch_and_store_products(query="breads")
     print("Fetched and stored products.")
+    print("Available categories:", get_categories())
