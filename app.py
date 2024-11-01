@@ -89,7 +89,7 @@ def login():
         if stored_password and verify_password(stored_password, password):
             session['user_id'] = email
             flash('Login successful!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('profile'))
         else:
             flash('Invalid email or password.', 'danger')
             return redirect(url_for('login'))
@@ -103,6 +103,38 @@ def index(category="All"):
     categories = get_categories()  # Fetch all available categories from the database
     products = get_products(category=category)  # Fetch products filtered by the selected category
     return render_template('index.html', categories=categories, products=products, current_category=category)
+
+# Route to display user profile and cart summary
+@app.route('/profile')
+@app.route('/profile/<string:category>')
+def profile(category="All"):
+    if 'user_id' not in session:
+        flash('Please log in to access your profile', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    categories = get_categories()
+    products = get_products(category=category)  # Filter products based on category
+    return render_template('profile.html', categories=categories, products=products, current_category=category)
+
+
+# Route to display account details
+@app.route('/account')
+def account():
+    if 'user_id' not in session:
+        flash('Please log in to access your account', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    return render_template('account.html', user_id=user_id)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
