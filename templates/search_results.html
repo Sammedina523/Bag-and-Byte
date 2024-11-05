@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results for "{{ query }}"</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="logo">
+                        <a href="{{ url_for('index') }}">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="logo-text">Bag & Byte</div>
+                </div>
+                <div class="col-auto ms-auto">
+                    <div class="login-signup">
+                        <a href="{{ url_for('login') }}">
+                            <button class="login-btn">Login</button>
+                        </a>
+                        <a href="{{ url_for('register') }}">
+                            <button class="signup-btn">Sign Up</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ url_for('view_cart') }}" style="font-size: 24px; color: inherit;">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+                <!-- Search Bar Container -->
+                <div class="col-auto">
+                    <form class="search-bar" action="{{ url_for('search') }}" method="GET">
+                        <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <h1>Search Results for "{{ query }}"</h1>
+        
+        <section class="products">
+            <div class="products-list">
+                {% if products %}
+                    {% for product in products %}
+                    <div class="product">
+                        <img src="{{ product['images'][0]['sizes'][0]['url'] }}" alt="{{ product['description'] }}">
+                        <p>{{ product['description'] }}</p>
+                        {% if product['items'][0]['price'] %}
+                            <p>${{ product['items'][0]['price']['regular'] }}</p>
+                            <button onclick="addToCart('{{ product['description'] }}', {{ product['items'][0]['price']['regular'] }})">
+                                Add to Cart
+                            </button>
+                        {% else %}
+                            <p>Price not available</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No products found for "{{ query }}".</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // JavaScript function to handle adding items to the cart
+        function addToCart(name, price) {
+            fetch('/add_to_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name, price: price })
+            }).then(response => response.json())
+              .then(data => {
+                  alert(data.message);  // Notify the user that item was added
+              }).catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
