@@ -95,32 +95,31 @@ def create_products_table():
     conn.close()
 
 
-
 def fetch_and_store_products(query=''):
+    # Step 1: Get access token using kroger.py
     token = get_access_token()
     if not token:
         print("Failed to get access token.")
         return
 
+    # Step 2: Search for products with the provided query
     products_data = search_products(token, query)
     if not products_data or 'data' not in products_data:
         print("No products found or an error occurred.")
         return
 
+    # Step 3: Store products in the database
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
     for product in products_data['data']:
-        # Strip leading zeros from product_id
-        product_id = int(product.get('productId').lstrip('0')) if product.get('productId') else None
-
-        # Print the product ID for debugging
-        print(f"Storing product: ID={product_id}, Name={product.get('description')}")
-
+        product_id = product.get('productId')
         name = product.get('description')
         price = product['items'][0].get('price', {}).get('regular') if product.get('items') else None
         image_url = product['images'][0]['sizes'][0]['url'] if product.get('images') else None
-        category = product.get('categories', ["Uncategorized"])[0]
+        # Extract category - assuming the category is located in `categories` field as a list
+        category = product.get('categories', ["Uncategorized"])[0]  # Adjust if necessary
 
+        # Insert or replace product information in the products table
         cursor.execute('''
             INSERT OR REPLACE INTO products (product_id, name, price, image_url, category)
             VALUES (?, ?, ?, ?, ?)
@@ -129,7 +128,6 @@ def fetch_and_store_products(query=''):
     conn.commit()
     conn.close()
     print("Products have been successfully stored in the database.")
-
 
 def get_products(category=None):
     conn = sqlite3.connect('users.db')
@@ -140,35 +138,6 @@ def get_products(category=None):
     else:
         cursor.execute('SELECT product_id, name, price, image_url FROM products')
         
-    products = cursor.fetchall()
-    conn.close()
-    return [{'product_id': row[0], 'name': row[1], 'price': row[2], 'image_url': row[3]} for row in products]
-
-
-def get_product_by_id(product_id):
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT product_id, name, price, image_url, category FROM products WHERE product_id = ?', (product_id,))
-    product = cursor.fetchone()
-    conn.close()
-
-    if product:
-        print("Product found:", product)  # Debug line
-        return {
-            'product_id': product[0],
-            'name': product[1],
-            'price': product[2],
-            'image_url': product[3],
-            'category': product[4]
-        }
-    
-    print("No product found")  # Debug line
-    return None
-
-def get_suggested_products(category):
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT product_id, name, price, image_url FROM products WHERE category = ? LIMIT 5', (category,))
     products = cursor.fetchall()
     conn.close()
     return [{'product_id': row[0], 'name': row[1], 'price': row[2], 'image_url': row[3]} for row in products]

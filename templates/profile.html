@@ -138,15 +138,11 @@
             <div class="products-list">
                 {% for product in products %}
                 <div class="product">
-                    <a href="{{ url_for('product_detail', product_id=product['product_id']) }}" onclick="console.log(this.href)">
-                        <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
-                        <p>{{ product['name'] }}</p>
-                        
-
-                    </a>
+                    <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+                    <p>{{ product['name'] }}</p>
                     {% if product['price'] %}
                         <p>${{ product['price'] }}</p>
-                        <button onclick="addToCart('{{ product['product_id'] }}', 1)">
+                        <button onclick="addToCart('{{ product['name'] }}', {{ product['price'] }})">
                             Add to Cart
                         </button>
                     {% else %}
@@ -159,13 +155,13 @@
 
         <script>
             // JavaScript function to handle adding items to the cart
-            function addToCart(productId, quantity) {
+            function addToCart(name, price) {
                 fetch('/add_to_cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ product_id: productId, quantity: quantity })
+                    body: JSON.stringify({ name: name, price: price })
                 }).then(response => response.json())
                   .then(data => {
                       alert(data.message);  // Notify the user that item was added
