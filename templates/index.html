@@ -102,9 +102,17 @@
                         <i class="fas fa-shopping-cart"></i>
                     </a>
                 </div>
+                <!-- Search Bar Container -->
+                <div class="col-auto">
+                    <form class="search-bar" action="{{ url_for('search') }}" method="GET">
+                        <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
+    
 
     <!-- Category bar -->
     <nav class="category-bar">

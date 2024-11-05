@@ -1,8 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories
+from kroger import KrogerAPI
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
+kroger_api = KrogerAPI()
+
+@app.route('/search')
+def search():
+    query = request.args.get('query')
+    if query:
+        # Use KrogerAPI to search for products
+        products = kroger_api.search_products(query)
+        return render_template('search_results.html', products=products, query=query)
+    return render_template('search_results.html', products=[], query=query)
 
 # Route for user registration
 @app.route('/register', methods=['GET', 'POST'])

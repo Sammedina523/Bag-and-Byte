@@ -1,3 +1,25 @@
+@font-face {
+    font-family: 'Aspira';
+    src: url('fonts/Aspira-Medium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'LarsseitLight';
+    src: url('fonts/LarsseitLight.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'LarsseitMedium';
+    src: url('fonts/LarsseitMedium.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -30,8 +52,8 @@ header {
     align-items: center;
     border: 1px solid #ccc;
     border-radius: 20px;
-    padding: 5px;
-    width: 60%;
+    padding: 5px 10px;
+    width: 300px;
 }
 
 .search-bar input {
@@ -122,50 +144,51 @@ header {
 }
 
 .product {
+    display: flex;
+    flex-direction: column; /* Arrange items in a vertical column */
+    justify-content: space-between;
     text-align: center;
     width: 150px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 8px;
+    font-family: 'LarsseitMedium', sans-serif; /* Apply the custom font */
 }
 
-.product img {
+.product button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Aspira', sans-serif; /* Use the custom font */
+    font-size: 16px; /* Adjust font size as needed */
+    margin-top: auto;
+}
+
+.product button:hover {
+    background-color: #218838;
+}
+
+.product img {/* Makes the image a block element */
+    margin: 0 auto;
     width: 100px;
-    height: 100px;
+    height: auto;
     background-color: #f0f0f0;
     margin-bottom: 10px;
 }
 
 .product p {
-    margin: 5px 0;
+    margin: 10px 0;
     font-size: 16px;
+    font-family: 'LarsseitMedium', sans-serif;
 }
 
 h2 {
     font-family: 'Courier New', Courier, monospace;
     color: #333;
-}
-
-/* Refresh button styling */
-.refresh-button {
-    background-color: #5bc0de;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 20px;
-    display: inline-flex;
-    align-items: center;
-}
-
-.refresh-button i {
-    margin-right: 8px;
-}
-
-.refresh-button:hover {
-    opacity: 0.9;
 }
 
 /* Placeholder styling */
@@ -203,5 +226,5 @@ h2 {
 
 /* Button styles */
 .login-btn, .signup-btn, .btn-primary, .btn-secondary {
-    font-family: 'Courier New', Courier, monospace; /* Same font for buttons */
+    font-family: 'Aspira', sans-serif, monospace; /* Same font for buttons */
 }

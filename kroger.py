@@ -86,3 +86,28 @@ if __name__ == "__main__":
             print("No seasonal items found or an error occurred.")
     else:
         print("Failed to get access token.")
+
+class KrogerAPI:
+    def __init__(self):
+        self.base_url = "https://api.kroger.com/v1"
+        self.access_token = get_access_token()  # Call get_access_token to retrieve the token dynamically
+        if not self.access_token:
+            raise Exception("Failed to retrieve access token.")
+        self.headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Accept": "application/json"
+        }
+
+    def search_products(self, query, limit=10):
+        endpoint = f"{self.base_url}/products"
+        params = {
+            "filter.term": query,
+            "filter.limit": limit
+        }
+        
+        response = requests.get(endpoint, headers=self.headers, params=params)
+        if response.status_code == 200:
+            return response.json().get("data", [])
+        else:
+            print(f"Error {response.status_code}: {response.text}")
+            return []
