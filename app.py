@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
@@ -27,11 +27,17 @@ def add_to_cart():
 
     user_id = session['user_id']
     data = request.get_json()
-    product_name = data['name']
-    price = data['price']
+    product_id = data['product_id']
+    quantity = int(data['quantity'])
 
-    add_to_cart_db(user_id, product_name, price)
-    return jsonify({"message": f"{product_name} has been added to your cart!"})
+    # Get product details from the database
+    product = get_product_by_id(product_id)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+
+    # Add the product to the cart in the database
+    add_to_cart_db(user_id, product['name'], product['price'], quantity)
+    return jsonify({"message": f"{product['name']} has been added to your cart!"})
 
 # Route to update cart item quantity
 @app.route('/update_cart', methods=['POST'])
@@ -128,6 +134,19 @@ def account():
     user_id = session['user_id']
 
     return render_template('account.html', user_id=user_id)
+
+@app.route('/product/<int:product_id>')
+def product_detail(product_id):
+
+    print(f"Product ID received: {product_id}")
+
+    product = get_product_by_id(product_id)
+    if not product:
+        flash("Product not found.", "danger")
+        return redirect(url_for('index'))
+
+    return render_template('product_detail.html', product=product)
+
 
 @app.route('/logout', methods=['POST'])
 def logout():
