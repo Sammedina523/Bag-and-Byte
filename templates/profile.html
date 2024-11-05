@@ -96,7 +96,7 @@
         <div class="header">
             <div class="d-flex align-items-center">
                 <div class="logo">
-                    <a href="{{ url_for('index') }}">
+                    <a href="{{ url_for('profile') }}">
                         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
                     </a>
                 </div>
@@ -138,11 +138,15 @@
             <div class="products-list">
                 {% for product in products %}
                 <div class="product">
-                    <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
-                    <p>{{ product['name'] }}</p>
+                    <a href="{{ url_for('product_detail', product_id=product['product_id']) }}" onclick="console.log(this.href)">
+                        <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+                        <p>{{ product['name'] }}</p>
+                        
+
+                    </a>
                     {% if product['price'] %}
                         <p>${{ product['price'] }}</p>
-                        <button onclick="addToCart('{{ product['name'] }}', {{ product['price'] }})">
+                        <button onclick="addToCart('{{ product['product_id'] }}', 1)">
                             Add to Cart
                         </button>
                     {% else %}
@@ -155,13 +159,13 @@
 
         <script>
             // JavaScript function to handle adding items to the cart
-            function addToCart(name, price) {
+            function addToCart(productId, quantity) {
                 fetch('/add_to_cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ name: name, price: price })
+                    body: JSON.stringify({ product_id: productId, quantity: quantity })
                 }).then(response => response.json())
                   .then(data => {
                       alert(data.message);  // Notify the user that item was added
