@@ -108,11 +108,15 @@
                     <i class="fas fa-user-circle"></i> <!-- Profile Icon -->
                 </a>
                 <!-- Cart icon aligned to the right -->
-                <a href="{{ url_for('view_cart') }}">
+                <a href="{{ url_for('view_cart') }}" class="me-3">
                     <i class="fas fa-shopping-cart"></i>
                 </a>
+                <!-- Search Bar -->
+                <form class="search-bar" action="{{ url_for('search') }}" method="GET">
+                    <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
             </div>
-
         </div>
     </header>
 
