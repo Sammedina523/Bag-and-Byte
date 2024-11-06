@@ -1,17 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query
 from kroger import KrogerAPI
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
-kroger_api = KrogerAPI()
+
 
 @app.route('/search')
 def search():
     query = request.args.get('query')
     if query:
-        # Use KrogerAPI to search for products
-        products = kroger_api.search_products(query)
+        # Search the database for products that match the query
+        products = get_products_by_query(query)
         return render_template('search_results.html', products=products, query=query)
     return render_template('search_results.html', products=[], query=query)
 

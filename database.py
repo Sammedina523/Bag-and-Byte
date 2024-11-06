@@ -62,6 +62,16 @@ def update_cart_item(user_id, product_name, quantity):
     conn.commit()
     conn.close()
 
+def get_products_by_query(query):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    # Use a LIKE query to find products with names that contain the search query
+    cursor.execute("SELECT product_id, name, price, image_url FROM products WHERE name LIKE ?", ('%' + query + '%',))
+    products = cursor.fetchall()
+    conn.close()
+    # Convert to a list of dictionaries for easier rendering
+    return [{'product_id': row[0], 'name': row[1], 'price': row[2], 'image_url': row[3]} for row in products]
+
 def delete_cart_item(user_id, product_name):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
