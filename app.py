@@ -38,10 +38,8 @@ def add_to_cart():
 
     user_id = session['user_id']
     data = request.get_json()
-    product_name = data['name']
-    price = data['price']
-    product_id = data['product_id']
-    quantity = int(data['quantity'])
+    product_id = data.get('product_id')
+    quantity = int(data.get('quantity', 1))
 
     # Get product details from the database
     product = get_product_by_id(product_id)
