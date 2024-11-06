@@ -144,7 +144,7 @@ def account():
 def logout():
     session.pop('user_id', None)
     flash('You have been logged out.', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @app.route('/checkout')
 def checkout():

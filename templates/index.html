@@ -71,6 +71,28 @@
         .product button:hover {
             background-color: #218838;
         }
+
+        /* Flash message styling */
+        .flash-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #efd349;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+
+        .flash-message.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
@@ -98,7 +120,7 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ url_for('view_cart') }}" style="font-size: 24px; color: inherit;">
+                    <a href="{{ url_for('cart') }}" style="font-size: 24px; color: inherit;">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
                 </div>
@@ -146,6 +168,13 @@
                 {% endfor %}
             </div>
         </section>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-message" id="flash-message">
+                    {{ messages[0][1] }}
+                </div>
+            {% endif %}
+        {% endwith %}
 
         <script>
             // JavaScript function to handle adding items to the cart
@@ -161,6 +190,16 @@
                       alert(data.message);  // Notify the user that item was added
                   }).catch(error => console.error('Error:', error));
             }
+
+            // Automatically hide the flash message after 3 seconds
+            document.addEventListener('DOMContentLoaded', function () {
+                const flashMessage = document.getElementById('flash-message');
+                if (flashMessage) {
+                    setTimeout(function() {
+                        flashMessage.classList.add('hidden');
+                    }, 3000); // Hide the message after 3 seconds
+                }
+            });
         </script> 
     </main>
 </body>

@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Bag & Byte | Account Details</title>
     <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .right-icons {
+            margin-left: auto;
+        }
+
+        .right-icons a {
+            font-size: 24px;
+            color: inherit;
+            margin-left: 15px;
+        }
         .account-details {
             margin-top: 20px;
             padding: 20px;
@@ -36,24 +52,26 @@
     </style>
 </head>
 <body>
+    <!-- Header Section -->
     <header>
         <div class="header">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <div class="logo">
-                        <a href="{{ url_for('index') }}">
-                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-                        </a>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="logo-text">Bag & Byte</div>
-                </div>
-                <div class="col-auto ms-auto">
-                    <a href="{{ url_for('view_cart') }}" style="font-size: 24px; color: inherit;">
-                        <i class="fas fa-shopping-cart"></i>
+            <div class="d-flex align-items-center">
+                <div class="logo">
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
                     </a>
                 </div>
+                <div class="logo-text ms-2">Bag & Byte</div>
+            </div>
+            <div class="right-icons d-flex align-items-center">
+                <!-- Profile icon aligned to the right -->
+                <a href="{{ url_for('account') }}" class="me-3">
+                    <i class="fas fa-user-circle"></i> <!-- Profile Icon -->
+                </a>
+                <!-- Cart icon aligned to the right -->
+                <a href="{{ url_for('cart') }}" class="me-3">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
             </div>
         </div>
     </header>
