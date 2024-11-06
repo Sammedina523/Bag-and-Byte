@@ -47,6 +47,13 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            color: inherit;
+        }
+
+        .product a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .product img {
@@ -59,16 +66,17 @@
             margin: 10px 0;
         }
 
-        .product button {
+        .add-to-cart-btn {
             background-color: #28a745;
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
+            margin-top: 10px;
         }
 
-        .product button:hover {
+        .add-to-cart-btn:hover {
             background-color: #218838;
         }
 
@@ -78,7 +86,7 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #008a0b;
+            background-color: #efd349;
             color: white;
             padding: 15px 30px;
             border-radius: 5px;
@@ -146,7 +154,7 @@
 
     <main>
         <div class="banner">
-            <h1>Come and grab a byte tonyte</h1>
+            <h1>Come and grab a byte tonight</h1>
             <p>From a variety of fresh products</p>
         </div>
         
@@ -154,16 +162,16 @@
             <div class="products-list">
                 {% for product in products %}
                 <div class="product">
-                    <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
-                    <p>{{ product['name'] }}</p>
-                    {% if product['price'] %}
-                        <p>${{ product['price'] }}</p>
-                        <button onclick="addToCart('{{ product['name'] }}', {{ product['price'] }})">
-                            Add to Cart
-                        </button>
-                    {% else %}
-                        <p>Price not available</p>
-                    {% endif %}
+                    <a href="{{ url_for('product_detail', product_id=product['product_id']) }}">
+                        <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+                        <p>{{ product['name'] }}</p>
+                        {% if product['price'] %}
+                            <p>${{ product['price'] }}</p>
+                        {% else %}
+                            <p>Price not available</p>
+                        {% endif %}
+                    </a>
+                    <button class="add-to-cart-btn" onclick="addToCart('{{ product['product_id'] }}', 1)">Add to Cart</button>
                 </div>
                 {% endfor %}
             </div>
@@ -178,13 +186,13 @@
 
         <script>
             // JavaScript function to handle adding items to the cart
-            function addToCart(name, price) {
+            function addToCart(productId, quantity) {
                 fetch('/add_to_cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ name: name, price: price })
+                    body: JSON.stringify({ product_id: productId, quantity: quantity })
                 }).then(response => response.json())
                   .then(data => {
                       alert(data.message);  // Notify the user that item was added
