@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products
 from kroger import KrogerAPI
 
 app = Flask(__name__)
@@ -60,7 +60,9 @@ def product_detail(product_id):
         flash("Product not found.", "danger")
         return redirect(url_for('index'))
 
-    return render_template('product_detail.html', product=product)
+    suggested_products = get_suggested_products(product['category'])
+
+    return render_template('product_detail.html', product=product, suggested_products=suggested_products)
 
 
 # Route to update cart item quantity
