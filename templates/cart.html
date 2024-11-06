@@ -14,8 +14,22 @@
         }
 
 
+        /* Header styling */
         .header {
-            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .right-icons {
+            margin-left: auto;
+        }
+
+        .right-icons a {
+            font-size: 24px;
+            color: inherit;
+            margin-left: 15px;
         }
 
 
@@ -154,7 +168,7 @@
             <div class="row align-items-center">
                 <div class="col-auto">
                     <div class="logo">
-                        <a href="{{ url_for('index') }}">
+                        <a href="{{ url_for('profile') }}">
                             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
                         </a>
                     </div>
@@ -162,43 +176,9 @@
                 <div class="col-auto">
                     <div class="logo-text">Bag & Byte</div>
                 </div>
-                <div class="col-auto ms-auto">
-                    <div class="login-signup">
-                        <a href="{{ url_for('login') }}">
-                            <button class="login-btn">Login</button>
-                        </a>
-                        <a href="{{ url_for('register') }}">
-                            <button class="signup-btn">Sign Up</button>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <a href="{{ url_for('cart') }}" style="font-size: 24px; color: inherit;">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
-                </div>
-                <!-- Search Bar Container -->
-                <div class="col-auto">
-                    <form class="search-bar" action="{{ url_for('search') }}" method="GET">
-                        <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
-                        <button type="submit"><i class="fas fa-search"></i></button>
-                    </form>
-                </div>
             </div>
         </div>
     </header>
-   
-
-
-    <!-- Category bar -->
-    <nav class="category-bar">
-        <a href="{{ url_for('index') }}" class="{{ 'active' if current_category == 'All' else '' }}">All</a>
-        {% for category in categories %}
-            <a href="{{ url_for('index', category=category) }}" class="{{ 'active' if current_category == category else '' }}">{{ category }}</a>
-        {% endfor %}
-    </nav>
-
-
    
     <div class="cart-container" id="cart-container">
         <h1>Your Cart</h1>
@@ -227,7 +207,7 @@
             <p class="final-total">Total: ${{ '%.2f' % final_total }}</p>
 
 
-            <a href="{{ url_for('account') }}"><button class="btn btn-primary w-100">Checkout</button></a>
+            <a href="{{ url_for('checkout') }}"><button class="btn btn-primary w-100">Checkout</button></a>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Continue Shopping</button></a>
         {% else %}
             <!-- Empty cart layout -->
