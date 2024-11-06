@@ -77,7 +77,7 @@ def remove_from_cart():
 
 # Route to view cart
 @app.route('/cart')
-def view_cart():
+def cart():
     if 'user_id' not in session:
         flash('Please log in to view your cart', 'danger')
         return redirect(url_for('login'))
@@ -145,6 +145,19 @@ def logout():
     session.pop('user_id', None)
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/checkout')
+def checkout():
+    if 'user_id' not in session:
+        flash('Please log in to proceed to checkout', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    cart_items = get_cart(user_id)
+    total_price = sum(item[1] * item[2] for item in cart_items)
+
+    return render_template('checkout.html', cart=cart_items, total_price=total_price)
+
 
 
 if __name__ == "__main__":

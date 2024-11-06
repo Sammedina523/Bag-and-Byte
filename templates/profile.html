@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Bag & Byte | Profile</title>
+    <title>Bag & Byte | Checkout</title>
     <style>
         /* Category bar styling */
         .category-bar {
@@ -28,48 +28,63 @@
             color: #28a745;
         }
 
-        /* Flex container for horizontal layout with wrapping */
-        .products-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            padding: 20px;
+        /* Checkout form styling */
+        .checkout-form {
+            margin: 40px auto;
+            width: 70%;
+            max-width: 800px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Style for each product card */
-        .product {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            width: 200px;
+        .checkout-form h1 {
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-section {
             margin-bottom: 20px;
         }
 
-        .product img {
-            max-width: 100%;
-            height: auto;
+        .form-section h3 {
+            margin-bottom: 15px;
+        }
+
+        .form-section input,
+        .form-section select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
             border-radius: 4px;
+            border: 1px solid #ddd;
         }
 
-        .product p {
-            margin: 10px 0;
-        }
-
-        .product button {
+        .btn-primary {
             background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
+            border-color: #28a745;
         }
 
-        .product button:hover {
+        .btn-primary:hover {
             background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .back-to-cart {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .back-to-cart a {
+            color: #28a745;
+            text-decoration: none;
+        }
+
+        .back-to-cart a:hover {
+            text-decoration: underline;
         }
 
         /* Header styling */
@@ -92,6 +107,8 @@
     </style>
 </head>
 <body>
+
+    <!-- Header Section -->
     <header>
         <div class="header">
             <div class="d-flex align-items-center">
@@ -122,52 +139,71 @@
 
     <!-- Category bar -->
     <nav class="category-bar">
-        <a href="{{ url_for('profile', category='All') }}" class="{{ 'active' if current_category == 'All' else '' }}">All</a>
+        <a href="{{ url_for('checkout') }}" class="{{ 'active' if current_category == 'All' else '' }}">All</a>
         {% for category in categories %}
-            <a href="{{ url_for('profile', category=category) }}" class="{{ 'active' if current_category == category else '' }}">{{ category }}</a>
+            <a href="{{ url_for('checkout', category=category) }}" class="{{ 'active' if current_category == category else '' }}">{{ category }}</a>
         {% endfor %}
     </nav>
 
+    <!-- Main Checkout Form -->
     <main>
-        <div class="banner">
-            <h1>Come and grab a byte tonyte</h1>
-            <p>From a variety of fresh products</p>
-        </div>
-        
-        <section class="products">
-            <div class="products-list">
-                {% for product in products %}
-                <div class="product">
-                    <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
-                    <p>{{ product['name'] }}</p>
-                    {% if product['price'] %}
-                        <p>${{ product['price'] }}</p>
-                        <button onclick="addToCart('{{ product['name'] }}', {{ product['price'] }})">
-                            Add to Cart
-                        </button>
-                    {% else %}
-                        <p>Price not available</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </section>
+        <div class="checkout-form">
+            <h1>Checkout</h1>
 
-        <script>
-            // JavaScript function to handle adding items to the cart
-            function addToCart(name, price) {
-                fetch('/add_to_cart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: name, price: price })
-                }).then(response => response.json())
-                  .then(data => {
-                      alert(data.message);  // Notify the user that item was added
-                  }).catch(error => console.error('Error:', error));
-            }
-        </script> 
+            <form action="{{ url_for('complete_checkout') }}" method="POST">
+                
+                <!-- Delivery Address -->
+                <div class="form-section">
+                    <h3>Delivery Address</h3>
+                    <label for="address" class="form-label">Street Address</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                    
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" required>
+                    
+                    <label for="state" class="form-label">State</label>
+                    <select name="state" id="state" class="form-control" required>
+                        <option value="" selected="selected">-- Select State --</option>
+                        {% for state in states %}
+                            <option value="{{ state }}">{{ state }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <label for="zip_code" class="form-label">Zip Code</label>
+                    <input type="number" class="form-control" id="zip_code" name="zip_code" required>
+                </div>
+
+                <!-- Delivery Instructions -->
+                <div class="form-section">
+                    <h3>Delivery Instructions</h3>
+                    <label for="delivery_instructions" class="form-label">Delivery Instructions</label>
+                    <input type="text" class="form-control" id="delivery_instructions" name="delivery_instructions">
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="form-section">
+                    <h3>Payment Methods</h3>
+                    <label for="card_num" class="form-label">Card Number</label>
+                    <input type="number" class="form-control" id="card_num" name="card_num" required>
+                    
+                    <label for="exp_date" class="form-label">Expiration Date (MM/YY)</label>
+                    <input type="number" class="form-control" id="exp_date" name="exp_date" required>
+
+                    <label for="cvv" class="form-label">CVV</label>
+                    <input type="number" class="form-control" id="cvv" name="cvv" required>
+
+                    <label for="billing_zip" class="form-label">Billing Zip Code</label>
+                    <input type="number" class="form-control" id="billing_zip" name="billing_zip" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Complete Purchase</button>
+            </form>
+
+            <!-- Go Back to Cart Link -->
+            <div class="back-to-cart">
+                <a href="{{ url_for('view_cart') }}">Back to Cart</a>
+            </div>
+        </div>
     </main>
 </body>
 </html>

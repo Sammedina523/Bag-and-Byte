@@ -3,111 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='checkoutStyles.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <title>Check Out</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Checkout | Bag & Byte</title>
+    <style>
+        .category-bar {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .category-bar a {
+            margin: 0 15px;
+            color: #333;
+            font-size: 1em;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .category-bar a.active {
+            color: #28a745;
+        }
+
+        .checkout-form {
+            margin: 40px auto;
+            width: 70%;
+            max-width: 800px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-form h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+        }
+
+        .form-section input,
+        .form-section select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .btn-primary {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .back-to-cart {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .back-to-cart a {
+            color: #28a745;
+            text-decoration: none;
+        }
+
+        .back-to-cart a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <p>
-        <a href="{{ url_for('cart') }}">Back to Cart</a> 
-    </p>
-    <div class="delivery_information">
-        <h>Checkout</h>
-        <h1>Please fill out each section to continue.</h1>
-        <form>
-            <p1>
-                <h2>Delivery Address</h2>
 
-                <label for="address" class="form-label">Street Address</label>
-                <input type="text" class="form-control" id="text" name="address" required>
+    <!-- Header Section -->
+    <header>
+        <div class="header">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="logo">
+                        <a href="{{ url_for('index') }}">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="logo-text">Bag & Byte</div>
+                </div>
+                <div class="col-auto ms-auto">
+                    <div class="login-signup">
+                        <a href="{{ url_for('login') }}">
+                            <button class="login-btn">Login</button>
+                        </a>
+                        <a href="{{ url_for('register') }}">
+                            <button class="signup-btn">Sign Up</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ url_for('cart') }}" style="font-size: 24px; color: inherit;">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Category bar (optional if you want to include it) -->
+    <nav class="category-bar">
+        <a href="{{ url_for('index') }}" class="{{ 'active' if current_category == 'All' else '' }}">All</a>
+        {% for category in categories %}
+            <a href="{{ url_for('index', category=category) }}" class="{{ 'active' if current_category == category else '' }}">{{ category }}</a>
+        {% endfor %}
+    </nav>
+
+    <!-- Main Checkout Form -->
+    <main>
+        <div class="checkout-form">
+            <h1>Checkout</h1>
+
+            <form action="{{ url_for('complete_checkout') }}" method="POST">
                 
-                <label for="city" class="form-label">City</label>
-                <input type="text" class="form-control" id="text" name="city" required>
-                
-                <br>
-                <label for="state">State</label>
-                <br>
-                <select name = "State" id="state" size="1">
-                    <option value="" selected="selected">-- Select State --</option>
-                    <option value="Alabama">Alabama</option>
-                    <option value = "Alaska">Alaska</option>
-                    <option value = "Arizona">Arizona</option>
-                    <option value = "Arkansas">Arkansas</option>
-                    <option value = "California">California</option>
-                    <option value = "Colorado">Colorado</option>
-                    <option value = "Connecticut">Connecticut</option>
-                    <option value = "Delaware">Delaware</option>
-                    <option value = "Florida">Florida</option>
-                    <option value = "Georgia">Georgia</option>
-                    <option value = "Hawaii">Hawaii</option>
-                    <option value = "Idaho">Idaho</option>
-                    <option value = "Illinois">Illinois</option>
-                    <option value = "Indiana">Indiana</option>
-                    <option value = "Iowa">Iowa</option>
-                    <option value = "Kansas">Kansas</option>
-                    <option value = "Kentucky">Kentucky</option>
-                    <option value = "Louisiana">Louisiana</option>
-                    <option value = "Maine">Maine</option>
-                    <option value = "Maryland">Maryland</option>
-                    <option value = "Massachusetts">Massachusetts</option>
-                    <option value = "Michigan">Michigan</option>
-                    <option value = "Minnesota">Minnesota</option>
-                    <option value = "Mississippi">Mississippi</option>
-                    <option value = "Missouri">Missouri</option>
-                    <option value = "Montana">Montana</option>
-                    <option value = "Nebraska">Nebraska</option>
-                    <option value = "Nevada">Nevada</option>
-                    <option value = "New Hampshire">New Hampshire</option>
-                    <option value = "New Jersey">New Jersey</option>
-                    <option value = "New Mexico">New Mexico</option>
-                    <option value = "New York">New York</option>
-                    <option value = "North Carolina">North Carolina</option>
-                    <option value = "North Dakota">North Dakota</option>
-                    <option value = "Ohio">Ohio</option>
-                    <option value = "Oklahoma">Oklahoma</option>
-                    <option value = "Oregon">Oregon</option>
-                    <option value = "Pennsylvania">Pennsylvania</option>
-                    <option value = "Rhode Island">Rhode Island</option>
-                    <option value = "South Carolina">South Carolina</option>
-                    <option value = "South Dakota">South Dakota</option>
-                    <option value = "Tennessee">Tennessee</option>
-                    <option value = "Texas">Texas</option>
-                    <option value = "Utah">Utah</option>
-                    <option value = "Vermont">Vermont</option>
-                    <option value = "Virginia">Virginia</option>
-                    <option value = "Washington">Washington</option>
-                    <option value = "West Virginia">West Virginia</option>
-                    <option value = "Wisconsin">Wisconsin</option>
-                    <option value = "Wyoming">Wyoming</option>
-                </select>
-                <br>
+                <!-- Delivery Address -->
+                <div class="form-section">
+                    <h3>Delivery Address</h3>
+                    <label for="address" class="form-label">Street Address</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                    
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" required>
+                    
+                    <label for="state" class="form-label">State</label>
+                    <select name="state" id="state" class="form-control" required>
+                        <option value="" selected="selected">-- Select State --</option>
+                        {% for state in states %}
+                            <option value="{{ state }}">{{ state }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <label for="zip_code" class="form-label">Zip Code</label>
+                    <input type="number" class="form-control" id="zip_code" name="zip_code" required>
+                </div>
 
-                <br>
-                <label for="zip_code" class="form-label">Zip Code</label>
-                <input type="number" class="form-control" id="number" name="zip_code" required>
-            </p1>
-            <p2>
-                <h3>Delivery Instructions</h3>
-                <label for="deli_instr" class="form-label">Delivery Instructions</label>
-                <input type="text" class="form-control" id="text" name="deli_instr" required>
-            </p2>
-            <p3>
-                <h4>Payment Methods</h4>
-                <label for="card_num" class="form-label">Card Number</label>
-                <input type="number" class="form-control" id="number" name="card_num" required>
-                
-                <label for="exp_date" class="form-label">Expiration Date (mm/yy)</label>
-                <input type="number" class="form-control" id="number" name="exp_date" required>
+                <!-- Delivery Instructions -->
+                <div class="form-section">
+                    <h3>Delivery Instructions</h3>
+                    <label for="delivery_instructions" class="form-label">Delivery Instructions</label>
+                    <input type="text" class="form-control" id="delivery_instructions" name="delivery_instructions">
+                </div>
 
-                <label for="cvv" class="form-label">CVV</label>
-                <input type="number" class="form-control" id="number" name="cvv" required>
+                <!-- Payment Methods -->
+                <div class="form-section">
+                    <h3>Payment Methods</h3>
+                    <label for="card_num" class="form-label">Card Number</label>
+                    <input type="number" class="form-control" id="card_num" name="card_num" required>
+                    
+                    <label for="exp_date" class="form-label">Expiration Date (MM/YY)</label>
+                    <input type="number" class="form-control" id="exp_date" name="exp_date" required>
 
-                <label for="bill_zip" class="form-label">Billing Zip Code</label>
-                <input type="number" class="form-control" id="number" name="bill_zip" required>
-            </p3>
-            <input type="button" value = "Purchase">
-        </form>
-    </div>       
+                    <label for="cvv" class="form-label">CVV</label>
+                    <input type="number" class="form-control" id="cvv" name="cvv" required>
+
+                    <label for="billing_zip" class="form-label">Billing Zip Code</label>
+                    <input type="number" class="form-control" id="billing_zip" name="billing_zip" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Complete Purchase</button>
+            </form>
+
+            <!-- Go Back to Cart Link -->
+            <div class="back-to-cart">
+                <a href="{{ url_for('cart') }}">Back to Cart</a>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
