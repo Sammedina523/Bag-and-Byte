@@ -9,14 +9,15 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            background-color: #f5f5f5;
             color: #333;
         }
+
+
+        .header {
+            padding: 10px 0;
+        }
+
 
         .cart-container {
             text-align: center;
@@ -25,12 +26,15 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 400px;
+            margin: 60px auto 0; /* Add top margin to place it below the header */
         }
+
 
         .cart-container h1 {
             font-size: 24px;
             margin-bottom: 20px;
         }
+
 
         .cart-item {
             display: flex;
@@ -39,24 +43,31 @@
             font-size: 16px;
         }
 
+
         .cart-item input[type="number"] {
             width: 60px;
             text-align: center;
         }
+
 
         .cart-item .remove-button {
             color: #d9534f;
             cursor: pointer;
         }
 
+
         .cart-item .remove-button:hover {
             text-decoration: underline;
         }
 
-        .total-price {
+
+        .total-price,
+        .tax-amount,
+        .final-total {
             font-weight: bold;
-            margin-top: 20px;
+            margin-top: 10px;
         }
+
 
         .empty-message {
             font-size: 18px;
@@ -64,10 +75,12 @@
             margin-bottom: 10px;
         }
 
+
         .browse-message {
             color: #888;
             margin-bottom: 20px;
         }
+
 
         .browse-button {
             background-color: #28a745;
@@ -80,8 +93,32 @@
             text-decoration: none;
         }
 
+
         .browse-button:hover {
             background-color: #218838;
+        }
+
+
+        /* Category bar styling */
+        .category-bar {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        .category-bar a {
+            margin: 0 15px;
+            color: #333;
+            font-size: 1em;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+
+        .category-bar a.active {
+            color: #28a745;
         }
     </style>
     <script>
@@ -96,6 +133,7 @@
             location.reload();    // Reload to update the cart view
         }
 
+
         async function removeFromCart(name) {
             const response = await fetch('/remove_from_cart', {
                 method: 'POST',
@@ -109,9 +147,62 @@
     </script>
 </head>
 <body>
+
+
+    <header>
+        <div class="header">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="logo">
+                        <a href="{{ url_for('index') }}">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="logo-text">Bag & Byte</div>
+                </div>
+                <div class="col-auto ms-auto">
+                    <div class="login-signup">
+                        <a href="{{ url_for('login') }}">
+                            <button class="login-btn">Login</button>
+                        </a>
+                        <a href="{{ url_for('register') }}">
+                            <button class="signup-btn">Sign Up</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ url_for('cart') }}" style="font-size: 24px; color: inherit;">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+                <!-- Search Bar Container -->
+                <div class="col-auto">
+                    <form class="search-bar" action="{{ url_for('search') }}" method="GET">
+                        <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+   
+
+
+    <!-- Category bar -->
+    <nav class="category-bar">
+        <a href="{{ url_for('index') }}" class="{{ 'active' if current_category == 'All' else '' }}">All</a>
+        {% for category in categories %}
+            <a href="{{ url_for('index', category=category) }}" class="{{ 'active' if current_category == category else '' }}">{{ category }}</a>
+        {% endfor %}
+    </nav>
+
+
+   
     <div class="cart-container" id="cart-container">
         <h1>Your Cart</h1>
-        
+       
         {% if cart %}
             <!-- Display cart items -->
             <div id="cart-items">
@@ -125,8 +216,18 @@
                     </div>
                 {% endfor %}
             </div>
-            <p class="total-price">Total: ${{ total_price }}</p>
-            <a href="{{ url_for('checkout') }}"><button class="btn btn-primary w-100">Checkout</button></a>
+            <!-- Calculate and display tax and final total -->
+            {% set tax_rate = 0.0875 %}
+            {% set tax_amount = total_price * tax_rate %}
+            {% set final_total = total_price + tax_amount %}
+
+
+            <p class="total-price">Subtotal: ${{ '%.2f' % total_price }}</p>
+            <p class="tax-amount">Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
+            <p class="final-total">Total: ${{ '%.2f' % final_total }}</p>
+
+
+            <a href="{{ url_for('account') }}"><button class="btn btn-primary w-100">Checkout</button></a>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Continue Shopping</button></a>
         {% else %}
             <!-- Empty cart layout -->
@@ -137,3 +238,6 @@
     </div>
 </body>
 </html>
+
+
+
