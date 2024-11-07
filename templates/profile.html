@@ -191,7 +191,7 @@
                             <p>Price not available</p>
                         {% endif %}
                     </a>
-                    <button class="add-to-cart-btn" onclick="addToCart('{{ product['product_id'] }}', 1)">Add to Cart</button>
+                    <button class="add-to-cart-btn" onclick="addToCart('{{ product['product_id']}}', 1)">Add to Cart</button>
                 </div>
                 {% endfor %}
             </div>
@@ -208,13 +208,13 @@
 
     <script>
         // JavaScript function to handle adding items to the cart
-        function addToCart(name, price) {
+        function addToCart(productId, quantity) {
             fetch('/add_to_cart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name: name, price: price })
+                body: JSON.stringify({ product_id: productId, quantity: quantity })
             }).then(response => response.json())
               .then(data => {
                   alert(data.message);  // Notify the user that item was added
