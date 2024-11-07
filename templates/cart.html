@@ -13,49 +13,52 @@
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            margin: 60px auto 0; /* Add top margin to place it below the header */
+            width: 500px;
+            margin: 60px auto 0;
         }
-
 
         .cart-container h1 {
             font-size: 24px;
             margin-bottom: 20px;
         }
 
-
         .cart-item {
             display: flex;
+            align-items: center;
             justify-content: space-between;
             margin: 10px 0;
             font-size: 16px;
         }
 
+        .cart-image {
+            width: 60px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+            text-align: left;
+        }
 
         .cart-item input[type="number"] {
             width: 60px;
             text-align: center;
         }
 
-
         .cart-item .remove-button {
             color: #d9534f;
             cursor: pointer;
         }
 
-
         .cart-item .remove-button:hover {
             text-decoration: underline;
         }
 
-
-        .total-price,
-        .tax-amount,
-        .final-total {
+        .total-price, .tax-amount, .final-total {
             font-weight: bold;
             margin-top: 10px;
         }
-
 
         .empty-message {
             font-size: 18px;
@@ -63,12 +66,10 @@
             margin-bottom: 10px;
         }
 
-
         .browse-message {
             color: #888;
             margin-bottom: 20px;
         }
-
 
         .browse-button {
             background-color: #28a745;
@@ -81,32 +82,8 @@
             text-decoration: none;
         }
 
-
         .browse-button:hover {
             background-color: #218838;
-        }
-
-
-        /* Category bar styling */
-        .category-bar {
-            background-color: #f8f9fa;
-            padding: 10px 0;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-
-        .category-bar a {
-            margin: 0 15px;
-            color: #333;
-            font-size: 1em;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-
-        .category-bar a.active {
-            color: #28a745;
         }
     </style>
     <script>
@@ -120,7 +97,6 @@
             alert(data.message);  // Show a message to the user (optional)
             location.reload();    // Reload to update the cart view
         }
-
 
         async function removeFromCart(name) {
             const response = await fetch('/remove_from_cart', {
@@ -146,28 +122,16 @@
                 </div>
                 <div class="logo-text">Bag & Byte</div>
             </div>
-            
             <div class="right-icons">
                 {% if session.get('user_id') %}
-                    <!-- If user is logged in, show account and cart icons -->
-                    <a href="{{ url_for('account') }}">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                    <a href="{{ url_for('cart') }}">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
+                    <a href="{{ url_for('account') }}"><i class="fas fa-user-circle"></i></a>
+                    <a href="{{ url_for('cart') }}"><i class="fas fa-shopping-cart"></i></a>
                 {% else %}
-                    <!-- If user is not logged in, show login and signup buttons -->
                     <div class="login-signup">
-                        <a href="{{ url_for('login') }}">
-                            <button class="login-btn">Login</button>
-                        </a>
-                        <a href="{{ url_for('register') }}">
-                            <button class="signup-btn">Sign Up</button>
-                        </a>
+                        <a href="{{ url_for('login') }}"><button class="login-btn">Login</button></a>
+                        <a href="{{ url_for('register') }}"><button class="signup-btn">Sign Up</button></a>
                     </div>
                 {% endif %}
-                
                 <form class="search-bar" action="{{ url_for('search') }}" method="GET">
                     <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
                     <button type="submit"><i class="fas fa-search"></i></button>
@@ -175,46 +139,41 @@
             </div>
         </div>
     </header>
-   
+
     <div class="cart-container" id="cart-container">
         <h1>Your Cart</h1>
-       
+
         {% if cart %}
-            <!-- Display cart items -->
             <div id="cart-items">
                 {% for item in cart %}
                     <div class="cart-item">
-                        <span>{{ item[0] }} - ${{ item[1] }}</span>
+                        <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="cart-image">
+                        <div class="cart-item-info">
+                            <span>{{ item['name'] }} - ${{ '%.2f' % item['price'] }}</span>
+                        </div>
                         <div>
-                            <input type="number" min="1" value="{{ item[2] }}" onchange="updateCartItem('{{ item[0] }}', this.value)">
-                            <span class="remove-button" onclick="removeFromCart('{{ item[0] }}')">Remove</span>
+                            <input type="number" min="1" value="{{ item['quantity'] }}" onchange="updateCartItem('{{ item['name'] }}', this.value)">
+                            <span class="remove-button" onclick="removeFromCart('{{ item['name'] }}')">Remove</span>
                         </div>
                     </div>
                 {% endfor %}
             </div>
-            <!-- Calculate and display tax and final total -->
+
             {% set tax_rate = 0.0875 %}
             {% set tax_amount = total_price * tax_rate %}
             {% set final_total = total_price + tax_amount %}
-
 
             <p class="total-price">Subtotal: ${{ '%.2f' % total_price }}</p>
             <p class="tax-amount">Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
             <p class="final-total">Total: ${{ '%.2f' % final_total }}</p>
 
-
             <a href="{{ url_for('checkout') }}"><button class="btn btn-primary w-100">Checkout</button></a>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Continue Shopping</button></a>
         {% else %}
-            <!-- Empty cart layout -->
             <p class="empty-message">Your cart is empty...</p>
             <p class="browse-message">Start browsing!</p>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Browse</button></a>
         {% endif %}
     </div>
-
 </body>
 </html>
-
-
-

@@ -79,13 +79,20 @@ def delete_cart_item(user_id, product_name):
     conn.commit()
     conn.close()
 
+# In database.py
 def get_cart(user_id):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT product_name, price, quantity FROM cart WHERE user_id = ?', (user_id,))
+    cursor.execute('''
+        SELECT products.name, cart.price, cart.quantity, products.image_url
+        FROM cart
+        JOIN products ON cart.product_name = products.name
+        WHERE cart.user_id = ?
+    ''', (user_id,))
     cart_items = cursor.fetchall()
     conn.close()
-    return cart_items
+    return [{'name': row[0], 'price': row[1], 'quantity': row[2], 'image_url': row[3]} for row in cart_items]
+
 
 # Product management functions
 def create_products_table():

@@ -105,9 +105,12 @@ def cart():
 
     user_id = session['user_id']
     cart_items = get_cart(user_id)
-    total_price = sum(item[1] * item[2] for item in cart_items)
+
+    # Check if cart_items is a list of dictionaries with 'price' and 'quantity'
+    total_price = sum(item['price'] * item['quantity'] for item in cart_items)
 
     return render_template('cart.html', cart=cart_items, total_price=total_price)
+
 
 # Route for user login
 @app.route('/login', methods=['GET', 'POST'])
@@ -175,9 +178,12 @@ def checkout():
 
     user_id = session['user_id']
     cart_items = get_cart(user_id)
-    total_price = sum(item[1] * item[2] for item in cart_items)
+
+    # Calculate total_price by accessing 'price' and 'quantity' keys in cart_items
+    total_price = sum(item['price'] * item['quantity'] for item in cart_items)
 
     return render_template('checkout.html', cart=cart_items, total_price=total_price)
+
 
 
 

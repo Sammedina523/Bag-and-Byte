@@ -51,6 +51,8 @@
     </div>
 </header>
 
+<div style="height: 40px;"></div>
+
     <!-- Product Detail Section -->
     <div class="container product-container">
         {% if product %}
@@ -81,7 +83,7 @@
             <p>Product not found.</p>
         {% endif %}
     </div>
-
+    <div style="height: 40px;"></div>
     <!-- Suggested Products Section -->
     <div class="container suggested-products">
         <h3>Suggested Products</h3>
@@ -98,6 +100,8 @@
         </div>
     </div>
 
+  
+
     <script>
         function addToCart(productId) {
             const quantity = document.getElementById('quantity').value;
@@ -113,6 +117,10 @@
               }).catch(error => console.error('Error:', error));
         }
     </script>
-    {% include 'footer.html' %}
+
+<div style="height: 20px;"></div>
+{% include 'footer.html' %}
+    
 </body>
+
 </html>
