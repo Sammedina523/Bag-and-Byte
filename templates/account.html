@@ -8,22 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Bag & Byte | Account Details</title>
     <style>
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-        }
-
-        .right-icons {
-            margin-left: auto;
-        }
-
-        .right-icons a {
-            font-size: 24px;
-            color: inherit;
-            margin-left: 15px;
-        }
         .account-details {
             margin-top: 20px;
             padding: 20px;
@@ -52,7 +36,7 @@
     </style>
 </head>
 <body>
-    <!-- Header Section -->
+        <!-- Header Section -->
     <header>
         <div class="header">
             <div class="d-flex align-items-center">
@@ -61,17 +45,34 @@
                         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
                     </a>
                 </div>
-                <div class="logo-text ms-2">Bag & Byte</div>
+                <div class="logo-text">Bag & Byte</div>
             </div>
-            <div class="right-icons d-flex align-items-center">
-                <!-- Profile icon aligned to the right -->
-                <a href="{{ url_for('account') }}" class="me-3">
-                    <i class="fas fa-user-circle"></i> <!-- Profile Icon -->
-                </a>
-                <!-- Cart icon aligned to the right -->
-                <a href="{{ url_for('cart') }}" class="me-3">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
+            
+            <div class="right-icons">
+                {% if session.get('user_id') %}
+                    <!-- If user is logged in, show account and cart icons -->
+                    <a href="{{ url_for('account') }}">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <a href="{{ url_for('cart') }}">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                {% else %}
+                    <!-- If user is not logged in, show login and signup buttons -->
+                    <div class="login-signup">
+                        <a href="{{ url_for('login') }}">
+                            <button class="login-btn">Login</button>
+                        </a>
+                        <a href="{{ url_for('register') }}">
+                            <button class="signup-btn">Sign Up</button>
+                        </a>
+                    </div>
+                {% endif %}
+                
+                <form class="search-bar" action="{{ url_for('search') }}" method="GET">
+                    <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
             </div>
         </div>
     </header>

@@ -9,19 +9,43 @@
     <title>Bag & Byte | Register</title>
 </head>
 <body>
+    <!-- Header Section -->
     <header>
         <div class="header">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <div class="logo">
-                        <a href="{{ url_for('index') }}">
-                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <div class="d-flex align-items-center">
+                <div class="logo">
+                    <a href="{{ url_for('index') }}">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                    </a>
+                </div>
+                <div class="logo-text">Bag & Byte</div>
+            </div>
+            
+            <div class="right-icons">
+                {% if session.get('user_id') %}
+                    <!-- If user is logged in, show account and cart icons -->
+                    <a href="{{ url_for('account') }}">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <a href="{{ url_for('cart') }}">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                {% else %}
+                    <!-- If user is not logged in, show login and signup buttons -->
+                    <div class="login-signup">
+                        <a href="{{ url_for('login') }}">
+                            <button class="login-btn">Login</button>
+                        </a>
+                        <a href="{{ url_for('register') }}">
+                            <button class="signup-btn">Sign Up</button>
                         </a>
                     </div>
-                </div>
-                <div class="col-auto">
-                    <div class="logo-text">Bag & Byte</div>
-                </div>
+                {% endif %}
+                
+                <form class="search-bar" action="{{ url_for('search') }}" method="GET">
+                    <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
             </div>
         </div>
     </header>
