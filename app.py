@@ -164,6 +164,13 @@ def account():
 
     return render_template('account.html', user_id=user_id)
 
+@app.route('/is_logged_in')
+def is_logged_in():
+    # Check if the user_id is in the session
+    logged_in = 'user_id' in session
+    return jsonify({'logged_in': logged_in})
+
+
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('user_id', None)

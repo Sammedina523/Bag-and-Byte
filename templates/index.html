@@ -187,7 +187,18 @@
 
         <script>
             // JavaScript function to handle adding items to the cart
-            function addToCart(productId, quantity) {
+            async function addToCart(productId, quantity) {
+                // Check if the user is logged in
+                const response = await fetch('/is_logged_in');
+                const data = await response.json();
+
+                if (!data.logged_in) {
+                    // If the user is not logged in, redirect to the login page
+                    window.location.href = '/login';
+                    return;
+                }
+
+
                 fetch('/add_to_cart', {
                     method: 'POST',
                     headers: {
