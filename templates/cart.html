@@ -85,6 +85,11 @@
         .browse-button:hover {
             background-color: #218838;
         }
+
+        .clear-cart-button:hover {
+            background-color: #c82333;
+        }
+
     </style>
     <script>
         async function updateCartItem(name, quantity) {
@@ -105,9 +110,21 @@
                 body: JSON.stringify({ name: name })
             });
             const data = await response.json();
-            alert(data.message);  // Show a message to the user (optional)
+            alert(data.message);  // Show a message to the user
             location.reload();    // Reload to update the cart view
         }
+
+        async function clearCart() {
+            const response = await fetch('/clear_cart', {
+               method: 'POST',
+               headers: {'Content-Type': 'application/json'}
+            });
+            const data = await response.json();
+            alert(data.message);  // Show a message to the user
+            location.reload();    // Reload to update the cart view
+}
+
+
     </script>
 </head>
 <body>
@@ -154,6 +171,7 @@
                         <div>
                             <input type="number" min="1" value="{{ item['quantity'] }}" onchange="updateCartItem('{{ item['name'] }}', this.value)">
                             <span class="remove-button" onclick="removeFromCart('{{ item['name'] }}')">Remove</span>
+                        
                         </div>
                     </div>
                 {% endfor %}
@@ -170,8 +188,11 @@
             <a href="{{ url_for('checkout') }}"><button class="btn btn-primary w-100">Checkout</button></a>
             <div style="height: 20px;"></div>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Continue Shopping</button></a>
-        {% else %}
-            <p class="empty-message">Your cart is empty...</p>
+            <div style="height: 20px;"></div>
+            <button class="btn btn-tertiary w-100" onclick="clearCart()">Clear Cart</button>
+
+            {% else %}
+            <p class="empty-message">Your cart wants a byte...</p>
             <p class="browse-message">Start browsing!</p>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Browse</button></a>
         {% endif %}

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db
 from kroger import KrogerAPI
 
 app = Flask(__name__)
@@ -196,6 +196,19 @@ def checkout():
     total_price = sum(item['price'] * item['quantity'] for item in cart_items)
 
     return render_template('checkout.html', cart=cart_items, total_price=total_price)
+
+# Route to clear all items from the cart
+@app.route('/clear_cart', methods=['POST'])
+def clear_cart():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 403
+
+    user_id = session['user_id']
+
+    # Call a function to clear the cart in the database
+    clear_cart_db(user_id)
+
+    return jsonify({"message": "All items have been removed from your cart."})
 
 
 

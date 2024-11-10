@@ -79,6 +79,14 @@ def delete_cart_item(user_id, product_name):
     conn.commit()
     conn.close()
 
+def clear_cart_db(user_id):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM cart WHERE user_id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+
 # In database.py
 def get_cart(user_id):
     conn = sqlite3.connect('users.db')
