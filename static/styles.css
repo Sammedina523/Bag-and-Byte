@@ -20,8 +20,18 @@
     font-style: normal;
 }
 
+
+@font-face {
+    font-family: 'AvenirBlack';
+    src: url('fonts/Avenir Black.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+
+
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'LarsseitMedium', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
@@ -29,6 +39,7 @@ body {
 .logo img {
     height: 40px;
 }
+
 
 .search-bar-container {
     display: flex;
@@ -225,7 +236,8 @@ h2 {
 
 /* Specific styles for logo text and banner heading */
 .logo-text {
-    font-family: 'Courier New', Courier, monospace; /* Ensures the same font is used */
+    font-family: 'AvenirBlack', sans-serif, monospace; /* Ensures the same font is used */
+    font-weight: bold;
 }
 
 /* Button styles */
