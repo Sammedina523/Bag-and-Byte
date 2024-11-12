@@ -100,6 +100,8 @@ def remove_from_cart():
     product_name = data['name']
 
     delete_cart_item(user_id, product_name)
+    flash(f"{product_name} has been removed from your cart.", "success")
+    
     return jsonify({"message": f"{product_name} removed from your cart"})
 
 # Route to view cart
@@ -267,12 +269,9 @@ def process_checkout():
 def clear_cart():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 403
-
     user_id = session['user_id']
-
-    # Call a function to clear the cart in the database
-    clear_cart_db(user_id)
-
+    clear_cart_db(user_id)  # Clear the cart in the database
+    flash("Your cart has been cleared.", "success")
     return jsonify({"message": "All items have been removed from your cart."})
 
 @app.route('/orders')
