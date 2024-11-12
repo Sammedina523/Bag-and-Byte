@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order
 from kroger import KrogerAPI
 
 app = Flask(__name__)
