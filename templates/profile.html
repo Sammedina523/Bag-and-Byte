@@ -104,7 +104,7 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #005a10;
+            background-color: #01ac20;
             color: white;
             padding: 15px 30px;
             border-radius: 5px;
@@ -143,6 +143,7 @@
                     <a href="{{ url_for('cart') }}">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
+                    <a href="{{ url_for('orders') }}"><i class="fas fa-box"></i></a>
                 {% else %}
                     <!-- If user is not logged in, show login and signup buttons -->
                     <div class="login-signup">

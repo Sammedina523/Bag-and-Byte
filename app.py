@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order
 from kroger import KrogerAPI
 
 app = Flask(__name__)
@@ -185,6 +185,17 @@ def logout():
 
 @app.route('/checkout')
 def checkout():
+    states = [
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", 
+    "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", 
+    "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", 
+    "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", 
+    "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+    "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+    "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+    "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+    "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    ]
     if 'user_id' not in session:
         flash('Please log in to proceed to checkout', 'danger')
         return redirect(url_for('login'))
@@ -195,7 +206,61 @@ def checkout():
     # Calculate total_price by accessing 'price' and 'quantity' keys in cart_items
     total_price = sum(item['price'] * item['quantity'] for item in cart_items)
 
-    return render_template('checkout.html', cart=cart_items, total_price=total_price)
+    return render_template('checkout.html', states=states, cart=cart_items, total_price=total_price)
+
+@app.route('/process_checkout', methods=['POST'])
+def process_checkout():
+    if 'user_id' not in session:
+        flash('Please log in to proceed to checkout', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    cart_items = get_cart(user_id)
+
+    # Get the order details from the form
+    address = request.form.get('address')
+    city = request.form.get('city')
+    state = request.form.get('state')
+    zip_code = request.form.get('zip_code')
+    delivery_instructions = request.form.get('delivery_instructions')
+    card_num = request.form.get('card_num')
+    exp_date = request.form.get('exp_date')
+    cvv = request.form.get('cvv')
+    billing_zip = request.form.get('billing_zip')
+
+    # Simple validation for required fields
+    if not address or not city or not state or not zip_code:
+        flash('Please fill in all required fields for delivery.', 'danger')
+        return redirect(url_for('checkout'))
+
+    if not card_num or not exp_date or not cvv or not billing_zip:
+        flash('Please provide valid payment information.', 'danger')
+        return redirect(url_for('checkout'))
+
+    # Calculate total price from the cart
+    total_price = (sum(item['price'] * item['quantity'] for item in cart_items)) * (1.0875) 
+
+    # Place order into the database
+    order_id = place_order(
+        user_id=user_id,
+        cart_items=cart_items,
+        total_price=total_price,
+        address=address,
+        city=city,
+        state=state,
+        zip_code=zip_code,
+        delivery_instructions=delivery_instructions,
+        payment_status='Paid'  # In a real application, you'd verify payment through a gateway
+    )
+
+    # Clear the cart after order placement
+    clear_cart_db(user_id)
+
+    # Flash a success message and redirect to the order confirmation page
+    flash(f'Your order #{order_id} has been placed successfully!', 'success')
+    orders = get_user_orders(user_id)
+    return render_template('orders.html', orders=orders)
+
 
 # Route to clear all items from the cart
 @app.route('/clear_cart', methods=['POST'])
@@ -210,7 +275,63 @@ def clear_cart():
 
     return jsonify({"message": "All items have been removed from your cart."})
 
+@app.route('/orders')
+def orders():
+    if 'user_id' not in session:
+        flash('Please log in to view your orders.', 'danger')
+        return redirect(url_for('login'))
 
+    user_id = session['user_id']
+
+    # Retrieve all orders for the logged-in user
+    orders = get_user_orders(user_id)
+
+    return render_template('orders.html', orders=orders)
+
+@app.route('/confirm_order/<int:order_id>', methods=['POST'])
+def confirm_order(order_id):
+    # Fetch the order from the database using get_user_order_by_id
+    order = get_order_by_id(order_id)
+    
+    if not order:
+        flash('Order not found.', 'danger')
+        return redirect(url_for('orders'))
+    
+    # Check if the order is already completed
+    if order['order_status'] == 'completed':
+        flash('This order has already been completed.', 'info')
+        return redirect(url_for('orders'))
+    
+    # Use the update_order_status function to change the order status to 'Completed'
+    update_order_status(order_id, 'completed')
+
+    # Optionally, send a success message and redirect to the orders page
+    flash('Order confirmed successfully!', 'success')
+    return redirect(url_for('orders'))
+
+@app.route('/reorder/<int:order_id>', methods=['POST'])
+def reorder(order_id):
+    if 'user_id' not in session:
+        flash('Please log in to reorder.', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    # Fetch the original order from the database
+    order = get_order_by_id(order_id)
+    if not order or order['order_status'] != 'completed':
+        flash('Unable to reorder. This order has not been completed.', 'danger')
+        return redirect(url_for('orders'))
+
+    # Reorder the items
+    reordered_items = order['items']
+    
+    # Add items back to the cart for the user
+    for item in reordered_items:
+        add_to_cart_db(user_id, item['name'], item['price'], item['quantity'])
+
+    flash('Your order has been added to the cart for reordering!', 'success')
+    return redirect(url_for('cart'))
 
 
 if __name__ == "__main__":

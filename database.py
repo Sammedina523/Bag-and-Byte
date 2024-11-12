@@ -1,6 +1,7 @@
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from kroger import get_access_token, search_products
+import json
 
 # User management functions
 def add_user(email, password):
@@ -207,16 +208,163 @@ def get_categories():
     conn.close()
     return categories
 
-# Initialize tables if running this file
-if __name__ == "__main__":
-    create_cart_table()
-    create_products_table()
-    print("Cart and products tables created successfully.")
-    fetch_and_store_products(query="candy")
-    fetch_and_store_products(query="produce")
-    fetch_and_store_products(query="fruits")
-    fetch_and_store_products(query="dairy")
-    fetch_and_store_products(query="frozen")
-    fetch_and_store_products(query="breads")
-    print("Fetched and stored products.")
-    print("Available categories:", get_categories())
+def create_orders_table():
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('DROP TABLE IF EXISTS orders')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS orders (
+            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT,
+            order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            order_status TEXT,
+            total_price REAL,
+            items TEXT,  -- JSON-encoded list of items
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            zip_code INTEGER,
+            delivery_instructions TEXT,
+            payment_status TEXT  -- To store payment status
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def place_order(user_id, cart_items, total_price, address, city, state, zip_code, delivery_instructions, payment_status):
+    try:
+        # Open a connection to the SQLite database
+        with sqlite3.connect('users.db') as conn:
+            cursor = conn.cursor()
+            
+            # Serialize the cart items as a JSON string
+            items_json = json.dumps(cart_items)
+            
+            # Insert the order into the orders table
+            cursor.execute(''' 
+                INSERT INTO orders (user_id, order_status, total_price, items, address, city, state, zip_code, delivery_instructions, payment_status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (user_id, 'pending', total_price, items_json, address, city, state, zip_code, delivery_instructions, payment_status))
+            
+            # Commit the transaction (handled automatically by 'with' statement)
+            order_id = cursor.lastrowid  # Get the last inserted row's ID (this will be the order_id)
+            
+            # Return the created order_id
+            return order_id
+        
+    except sqlite3.Error as e:
+        # Handle any database errors gracefully
+        print(f"An error occurred: {e}")
+        return None
+
+# Get all orders for a user
+def get_user_orders(user_id):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+
+    # Fetch all orders for the given user_id
+    cursor.execute(''' 
+        SELECT order_id, order_date, order_status, total_price, items, address, city, state, zip_code, delivery_instructions, payment_status
+        FROM orders
+        WHERE user_id = ?
+        ORDER BY order_date DESC  -- Orders sorted by the most recent
+    ''', (user_id,))
+    
+    orders = cursor.fetchall()
+    conn.close()
+
+    # Format the results into a more readable structure
+    order_list = []
+    for order in orders:
+        try:
+            items = json.loads(order[4])  # Assuming order[4] is a JSON string
+            if not isinstance(items, list):
+                print(f"Expected a list but got: {type(items)}")
+                items = []  # or handle the error in another way
+        except json.JSONDecodeError:
+            items = []  # In case the JSON is malformed
+
+        order_data = {
+            'order_id': order[0],
+            'order_date': order[1],
+            'order_status': order[2],
+            'total_price': order[3],
+            'items': items,  # Deserialize the items JSON string
+            'address': order[5],
+            'city': order[6],
+            'state': order[7],
+            'zip_code': order[8],
+            'delivery_instructions': order[9],
+            'payment_status': order[10]
+        }
+        order_list.append(order_data)
+    
+    return order_list
+
+def update_order_status(order_id, new_status):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    
+    # Update the order status (from pending to completed)
+    cursor.execute('''
+        UPDATE orders
+        SET order_status = ?
+        WHERE order_id = ? AND order_status = 'pending'  -- Make sure we only update pending orders
+    ''', (new_status, order_id))
+    
+    conn.commit()
+    conn.close()
+
+# In database.py
+
+def get_order_by_id(order_id):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+
+    # Fetch the order by order_id
+    cursor.execute(''' 
+        SELECT order_id, order_date, order_status, total_price, items, address, city, state, zip_code, delivery_instructions, payment_status
+        FROM orders
+        WHERE order_id = ?
+    ''', (order_id,))
+
+    order = cursor.fetchone()
+    conn.close()
+
+    # Check if order exists
+    if order:
+        try:
+            # Deserialize the items from JSON
+            items = json.loads(order[4])  # order[4] is the 'items' field
+            if not isinstance(items, list):
+                print(f"Expected a list but got: {type(items)}")
+                items = []  # Handle error if it's not a list
+        except json.JSONDecodeError:
+            items = []  # In case the JSON is malformed
+
+        # Format the result as a dictionary (similar to get_user_orders)
+        order_data = {
+            'order_id': order[0],
+            'order_date': order[1],
+            'order_status': order[2],
+            'total_price': order[3],
+            'items': items,  # Deserialize the items JSON string
+            'address': order[5],
+            'city': order[6],
+            'state': order[7],
+            'zip_code': order[8],
+            'delivery_instructions': order[9],
+            'payment_status': order[10]
+        }
+
+        return order_data
+    
+    return None  # If no order is found for the given order_id
+
+
+
+
+
+
+
+    

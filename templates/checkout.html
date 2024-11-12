@@ -108,6 +108,7 @@
                     <a href="{{ url_for('cart') }}">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
+                    <a href="{{ url_for('orders') }}"><i class="fas fa-box"></i></a>
                 {% else %}
                     <!-- If user is not logged in, show login and signup buttons -->
                     <div class="login-signup">
@@ -133,8 +134,7 @@
         <div class="checkout-form">
             <h1>Checkout</h1>
 
-            <form action="{{ url_for('checkout') }}" method="POST">
-                
+            <form action="{{ url_for('process_checkout') }}" method="POST">
                 <!-- Delivery Address -->
                 <div class="form-section">
                     <h3>Delivery Address</h3>
@@ -155,14 +155,14 @@
                     <label for="zip_code" class="form-label">Zip Code</label>
                     <input type="number" class="form-control" id="zip_code" name="zip_code" required>
                 </div>
-
+            
                 <!-- Delivery Instructions -->
                 <div class="form-section">
                     <h3>Delivery Instructions</h3>
                     <label for="delivery_instructions" class="form-label">Delivery Instructions</label>
                     <input type="text" class="form-control" id="delivery_instructions" name="delivery_instructions">
                 </div>
-
+            
                 <!-- Payment Methods -->
                 <div class="form-section">
                     <h3>Payment Methods</h3>
@@ -171,16 +171,16 @@
                     
                     <label for="exp_date" class="form-label">Expiration Date (MM/YY)</label>
                     <input type="number" class="form-control" id="exp_date" name="exp_date" required>
-
+            
                     <label for="cvv" class="form-label">CVV</label>
                     <input type="number" class="form-control" id="cvv" name="cvv" required>
-
+            
                     <label for="billing_zip" class="form-label">Billing Zip Code</label>
                     <input type="number" class="form-control" id="billing_zip" name="billing_zip" required>
                 </div>
-
+            
                 <button type="submit" class="btn btn-primary">Complete Purchase</button>
-            </form>
+            </form>            
 
             <!-- Go Back to Cart Link -->
             <div class="back-to-cart">
