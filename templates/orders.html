@@ -34,9 +34,9 @@
             
             <div class="right-icons">
                 {% if session.get('user_id') %}
-                    <a href="{{ url_for('account') }}"><i class="fas fa-user-circle"></i></a>
-                    <a href="{{ url_for('cart') }}"><i class="fas fa-shopping-cart"></i></a>
-                    <a href="{{ url_for('orders') }}"><i class="fas fa-box"></i></a>
+                    <a href="{{ url_for('account') }}" class="icon-spacing"><i class="fas fa-user-circle"></i></a>
+                    <a href="{{ url_for('cart') }}" class="icon-spacing"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <div class="login-signup">
                         <a href="{{ url_for('login') }}">
@@ -66,8 +66,8 @@
                     {% for order in orders %}
                         <div class="list-group-item {% if order.order_status == 'pending' %}order-pending{% else %}order-completed{% endif %}">
                             <h5>Order ID: {{ order.order_id }} ({{ order.order_status }})</h5>
-                            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
-                            <p><strong>Total Price:</strong> ${{ order.total_price }}</p>
+                            <p><strong>Order Date:</strong> {{ order.order_date|to_12_hour }}</p>
+                            <p><strong>Total Price:</strong> ${{ order.total_price|round(2) }}</p>
 
                             <h6>Items:</h6>
 

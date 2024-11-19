@@ -149,9 +149,9 @@
             </div>
             <div class="right-icons">
                 {% if session.get('user_id') %}
-                    <a href="{{ url_for('account') }}"><i class="fas fa-user-circle"></i></a>
-                    <a href="{{ url_for('cart') }}"><i class="fas fa-shopping-cart"></i></a>
-                    <a href="{{ url_for('orders') }}"><i class="fas fa-box"></i></a>
+                    <a href="{{ url_for('account') }}" class="icon-spacing"><i class="fas fa-user-circle"></i></a>
+                    <a href="{{ url_for('cart') }}" class="icon-spacing"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <div class="login-signup">
                         <a href="{{ url_for('login') }}"><button class="login-btn">Login</button></a>

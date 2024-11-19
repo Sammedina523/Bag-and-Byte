@@ -158,6 +158,16 @@ body {
     padding: 10px;
     border-radius: 8px;
     font-family: 'LarsseitMedium', sans-serif; /* Apply the custom font */
+
+    opacity: 0;  /* Hide initially */
+    transform: translateY(20px); /* Slight downward movement */
+    transition: opacity .7s ease, transform .7s ease; /* Smooth animation */
+}
+
+/* When visible, apply fade-in */
+.product.visible {
+    opacity: 1; /* Fully visible */
+    transform: translateY(0); /* Original position */
 }
 
 .product button {
@@ -272,9 +282,21 @@ h2 {
     margin-left: auto;
 }
 
+.icon-spacing {
+    margin-left: 15px; 
+}
+
+.right-icons i {
+    font-size: 24px; 
+    width: 32px; 
+    height: 32px; 
+    line-height: normal; 
+    vertical-align: middle; 
+}
+
 .right-icons a {
-    font-size: 20px;
-    color: #333;
+    font-size: 20px; 
+    color: #212529;
 }
 
 .search-bar {

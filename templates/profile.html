@@ -137,13 +137,13 @@
             <div class="right-icons">
                 {% if session.get('user_id') %}
                     <!-- If user is logged in, show account and cart icons -->
-                    <a href="{{ url_for('account') }}">
+                    <a href="{{ url_for('account') }}" class="icon-spacing">
                         <i class="fas fa-user-circle"></i>
                     </a>
-                    <a href="{{ url_for('cart') }}">
+                    <a href="{{ url_for('cart') }}" class="icon-spacing">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
-                    <a href="{{ url_for('orders') }}"><i class="fas fa-box"></i></a>
+                    <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <!-- If user is not logged in, show login and signup buttons -->
                     <div class="login-signup">
@@ -197,6 +197,9 @@
                 {% endfor %}
             </div>
         </section>
+    
+
+
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -206,6 +209,8 @@
             {% endif %}
         {% endwith %}
     </main>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 
     <script>
         // JavaScript function to handle adding items to the cart
