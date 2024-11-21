@@ -183,7 +183,7 @@
     
     <div class="cart-container" id="cart-container">
 
-        <h1>Your Reciept</h1>
+        <h1>Your Order</h1>
 
         <div id="cart-items">
             {% for item in cart %}
@@ -210,6 +210,7 @@
         <div class="back-to-cart">
             <a href="{{ url_for('cart') }}">Back to Cart</a>
         </div>
+    </div>
 
     <!-- Main Checkout Form -->
     <main>
@@ -262,10 +263,6 @@
                         <input type="number" class="form-control" id="billing_zip" name="billing_zip" required>
                     </div>
                 </form>                
-        </div>
-        
     </main>
-    {% include 'footer.html' %}
-    <div style="height: 20px;"></div>
 </body>
 </html>
