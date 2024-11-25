@@ -77,7 +77,7 @@
                 <div class="add-to-cart-section">
                     <label for="quantity">Quantity:</label>
                     <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="form-control" style="width: 80px;">
-                    <button onclick="addToCart('{{ product['product_id'] }}')" class="btn btn-success">Add to Cart</button>
+                    <button onclick="addToCart('{{ product['product_id'] }}', document.getElementById('quantity').value)" class="btn btn-success">Add to Cart</button>
                 </div>
             </div>
         {% else %}
@@ -100,22 +100,33 @@
             {% endfor %}
         </div>
     </div>
-
-  
-
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function addToCart(productId) {
-            const quantity = document.getElementById('quantity').value;
-            fetch('/add_to_cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ product_id: productId, quantity: quantity })
-            }).then(response => response.json())
-              .then(data => {
-                  alert(data.message);  // Notify the user that item was added
-              }).catch(error => console.error('Error:', error));
+        // JavaScript function to handle adding items to the cart
+        async function addToCart(productId, quantity) {
+            const response = await fetch('/add_to_cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ product_id: productId, quantity: quantity })
+                });
+                if (response.ok) {
+                    // If the response is successful, you can handle success response
+                    const data = await response.json();
+                    // Optional: You might want to show a success message here or update UI accordingly
+                    console.log(data.message);
+                    window.location.href = '/profile';  // Reload to update the cart view
+                } else if (response.status === 401) {
+                    // If the user is not logged in, redirect to the login page
+                    window.location.href = '/login';
+                } else {
+                    // Handle other errors as needed
+                    const errorData = await response.json();
+                    console.error(errorData.error); // Log or display the error message
+                }
         }
     </script>
 

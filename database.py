@@ -244,7 +244,7 @@ def place_order(user_id, cart_items, total_price, address, city, state, zip_code
             cursor.execute(''' 
                 INSERT INTO orders (user_id, order_status, total_price, items, address, city, state, zip_code, delivery_instructions, payment_status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (user_id, 'pending', total_price, items_json, address, city, state, zip_code, delivery_instructions, payment_status))
+            ''', (user_id, 'completed', total_price, items_json, address, city, state, zip_code, delivery_instructions, payment_status))
             
             # Commit the transaction (handled automatically by 'with' statement)
             order_id = cursor.lastrowid  # Get the last inserted row's ID (this will be the order_id)

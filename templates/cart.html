@@ -92,6 +92,9 @@
         }
 
     </style>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         async function updateCartItem(name, quantity) {
             const response = await fetch('/update_cart', {
@@ -121,6 +124,16 @@
             const data = await response.json();
             location.reload();  // Reload to update the cart view
         }
+        // Automatically hide the flash messages after 3 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashMessages = document.querySelectorAll('.alert'); // Select all flash messages
+            flashMessages.forEach(function (flashMessage) {
+                setTimeout(function() {
+                    const alert = new bootstrap.Alert(flashMessage); // Use Bootstrap's JavaScript to hide
+                    alert.close();
+                }, 3000); // Hide the message after 3 seconds
+            });
+        });
     </script>
 </head>
 <body>

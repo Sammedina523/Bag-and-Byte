@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <!-- Header Section -->
     <header>
         <div class="header">
@@ -54,14 +64,6 @@
         <div class="row justify-content-center">
             <div class="col-md-4">
                 <h3 class="text-center">Sign in</h3>
-                <!-- Flash messages for feedback -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        <div class="alert alert-{{ messages[0][0] }}">
-                            {{ messages[0][1] }}
-                        </div>
-                    {% endif %}
-                {% endwith %}
                 
                 <form action="{{ url_for('login') }}" method="POST">
                     <div class="mb-3">
@@ -80,5 +82,20 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Automatically hide the flash messages after 3 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashMessages = document.querySelectorAll('.alert'); // Select all flash messages
+            flashMessages.forEach(function (flashMessage) {
+                setTimeout(function() {
+                    const alert = new bootstrap.Alert(flashMessage); // Use Bootstrap's JavaScript to hide
+                    alert.close();
+                }, 3000); // Hide the message after 3 seconds
+            });
+        });
+    </script>
 </body>
 </html>

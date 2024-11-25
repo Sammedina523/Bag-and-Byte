@@ -42,7 +42,8 @@ def register():
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
     if 'user_id' not in session:
-        return jsonify({"error": "User not logged in"}), 403
+        flash("You need to log in to add items to your cart.", "danger")  # Flash message for not logged in
+        return jsonify({"error": "Unauthorized"}), 401  # Return a 401 status code
 
     user_id = session['user_id']
     data = request.get_json()
@@ -52,11 +53,14 @@ def add_to_cart():
     # Get product details from the database
     product = get_product_by_id(product_id)
     if not product:
-        return jsonify({"error": "Product not found"}), 404
+        flash("Product not found.", "danger")  # Flash message if product is not found
+        return redirect(url_for('profile'))  # Redirect to profile or products page
 
     # Add the product to the cart in the database
     add_to_cart_db(user_id, product['name'], product['price'], quantity)
-    return jsonify({"message": f"{product['name']} has been added to your cart!"})
+    flash(f"{product['name']} has been added to your cart!", "success")  # Set success flash message
+
+    return jsonify({"message": f"{product['name']} has been added to your cart."})
 
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
@@ -270,8 +274,7 @@ def process_checkout():
 
     # Flash a success message and redirect to the order confirmation page
     flash(f'Your order #{order_id} has been placed successfully!', 'success')
-    orders = get_user_orders(user_id)
-    return render_template('orders.html', orders=orders)
+    return render_template('profile.html')
 
 
 # Route to clear all items from the cart
@@ -328,8 +331,8 @@ def reorder(order_id):
 
     # Fetch the original order from the database
     order = get_order_by_id(order_id)
-    if not order or order['order_status'] != 'completed':
-        flash('Unable to reorder. This order has not been completed.', 'danger')
+    if not order:
+        flash('Unable to reorder.', 'danger')
         return redirect(url_for('orders'))
 
     # Reorder the items
