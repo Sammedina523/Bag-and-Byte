@@ -182,35 +182,35 @@
     <!-- Receipt Display -->
     
     <div class="cart-container" id="cart-container">
-
         <h1>Your Order</h1>
-
         <div id="cart-items">
             {% for item in cart %}
                 <div class="cart-item">
+                    <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="cart-image">
                     <div class="cart-item-info">
                         <span>{{ item['name'] }} - ${{ '%.2f' % item['price'] }}</span>
                     </div>
                 </div>
             {% endfor %}
         </div>
-
+    
         {% set tax_rate = 0.0875 %}
         {% set tax_amount = total_price * tax_rate %}
         {% set final_total = total_price + tax_amount %}
-
+    
         <p class="total-price">Subtotal: ${{ '%.2f' % total_price }}</p>
         <p class="tax-amount">Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
         <p class="final-total">Total: ${{ '%.2f' % final_total }}</p>
-
+    
         <a href="{{ url_for('profile') }}"><button class="btn btn-primary w-100">Purchase</button></a>
         <div style="height: 20px;"></div>
-        
+    
         <!-- Go Back to Cart Link -->
         <div class="back-to-cart">
             <a href="{{ url_for('cart') }}">Back to Cart</a>
         </div>
     </div>
+    
 
     <!-- Main Checkout Form -->
     <main>
