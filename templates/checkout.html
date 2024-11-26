@@ -8,39 +8,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Checkout | Bag & Byte</title>
     <style>
-        .category-bar {
-            background-color: #f8f9fa;
-            padding: 10px 0;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .category-bar a {
-            margin: 0 15px;
-            color: #333;
-            font-size: 1em;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .category-bar a.active {
-            color: #28a745;
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 40px;
         }
 
         .checkout-form {
-            float:left;
-            margin: 40px auto;
-            width: 70%;
-            max-width: 800px;
-            padding: 30px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
             background-color: #fff;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .checkout-form h1 {
-            text-align: left;
-            margin-bottom: 30px;
+        .cart-container {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-form h1,
+        .cart-container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
         }
 
         .form-section {
@@ -48,7 +46,8 @@
         }
 
         .form-section h3 {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
 
         .form-section input,
@@ -71,67 +70,47 @@
         }
 
         .back-to-cart {
-            display: block;
+            display: flex;
+            justify-content: center;
             margin-top: 20px;
-            text-align: center;
-            font-size: 18px;
         }
 
         .back-to-cart a {
             color: #28a745;
             text-decoration: none;
+            font-size: 16px;
         }
 
         .back-to-cart a:hover {
             text-decoration: underline;
         }
-        .cart-container {
-            float: right;
-            text-align: center;
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 700px;
-            margin: 60px auto 0;
-        }
-
-        .cart-container h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
 
         .cart-item {
             display: flex;
-            align-items: right;
-            justify-content: space-between;
+            align-items: center;
             margin: 10px 0;
             font-size: 16px;
         }
 
-        .cart-image {
+        .cart-item img {
             width: 60px;
             height: auto;
             margin-right: 10px;
         }
 
-        .cart-item-info {
+        .cart-item span {
             flex-grow: 1;
             text-align: left;
         }
 
-        .cart-item input[type="number"] {
-            width: 60px;
+        .total-section {
             text-align: center;
+            margin-top: 20px;
         }
 
-        .cart-item .remove-button:hover {
-            text-decoration: underline;
-        }
-
-        .total-price, .tax-amount, .final-total {
+        .total-section p {
+            margin: 5px 0;
             font-weight: bold;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -145,21 +124,18 @@
                         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
                     </a>
                 </div>
-                <div class="logo-text">BAG & BYTE</div>
+                <div class="logo-text">Bag & Byte</div>
             </div>
             
             <div class="right-icons">
                 {% if session.get('user_id') %}
-                    <!-- If user is logged in, show account and cart icons -->
                     <a href="{{ url_for('account') }}" class="icon-spacing">
                         <i class="fas fa-user-circle"></i>
                     </a>
                     <a href="{{ url_for('cart') }}" class="icon-spacing">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
-                    <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
-                    <!-- If user is not logged in, show login and signup buttons -->
                     <div class="login-signup">
                         <a href="{{ url_for('login') }}">
                             <button class="login-btn">Login</button>
@@ -169,7 +145,6 @@
                         </a>
                     </div>
                 {% endif %}
-                
                 <form class="search-bar" action="{{ url_for('search') }}" method="GET">
                     <input type="text" name="query" placeholder="Search for products..." aria-label="Search" required>
                     <button type="submit"><i class="fas fa-search"></i></button>
@@ -178,91 +153,64 @@
         </div>
     </header>
 
+    <!-- Main Layout -->
+    <div class="main-container">
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+            <h1>Checkout</h1>
+            <form action="{{ url_for('checkout') }}" method="POST">
+                <div class="form-section">
+                    <h3>Delivery Address</h3>
+                    <label for="address">Street Address</label>
+                    <input type="text" id="address" name="address" required>
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required>
+                    <label for="state">State</label>
+                    <select id="state" name="state" required>
+                        <option value="">-- Select State --</option>
+                        {% for state in states %}
+                            <option value="{{ state }}">{{ state }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="zip_code">Zip Code</label>
+                    <input type="text" id="zip_code" name="zip_code" required>
+                </div>
+                <div class="form-section">
+                    <h3>Payment Details</h3>
+                    <label for="card_num">Card Number</label>
+                    <input type="text" id="card_num" name="card_num" required>
+                    <label for="exp_date">Expiration Date (MM/YY)</label>
+                    <input type="text" id="exp_date" name="exp_date" required>
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" name="cvv" required>
+                </div>
+            </form>
+        </div>
 
-    <!-- Receipt Display -->
-    
-    <div class="cart-container" id="cart-container">
-        <h1>Your Order</h1>
-        <div id="cart-items">
-            {% for item in cart %}
-                <div class="cart-item">
-                    <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="cart-image">
-                    <div class="cart-item-info">
+        <!-- Cart Summary -->
+        <div class="cart-container">
+            <h1>Your Order</h1>
+            <div id="cart-items">
+                {% for item in cart %}
+                    <div class="cart-item">
+                        <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}">
                         <span>{{ item['name'] }} - ${{ '%.2f' % item['price'] }}</span>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    
-        {% set tax_rate = 0.0875 %}
-        {% set tax_amount = total_price * tax_rate %}
-        {% set final_total = total_price + tax_amount %}
-    
-        <p class="total-price">Subtotal: ${{ '%.2f' % total_price }}</p>
-        <p class="tax-amount">Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
-        <p class="final-total">Total: ${{ '%.2f' % final_total }}</p>
-    
-        <a href="{{ url_for('profile') }}"><button class="btn btn-primary w-100">Purchase</button></a>
-        <div style="height: 20px;"></div>
-    
-        <!-- Go Back to Cart Link -->
-        <div class="back-to-cart">
-            <a href="{{ url_for('cart') }}">Back to Cart</a>
+                {% endfor %}
+            </div>
+            <div class="total-section">
+                {% set tax_rate = 0.0875 %}
+                {% set tax_amount = total_price * tax_rate %}
+                {% set final_total = total_price + tax_amount %}
+                <p>Subtotal: ${{ '%.2f' % total_price }}</p>
+                <p>Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
+                <p>Total: ${{ '%.2f' % final_total }}</p>
+            </div>
+            <button class="btn btn-primary w-100">Purchase</button>
+            <div class="back-to-cart">
+                <a href="{{ url_for('cart') }}">Back to Cart</a>
+            </div>
         </div>
     </div>
-    
-
-    <!-- Main Checkout Form -->
-    <main>
-        <div class="checkout-form">
-
-                <h1>Checkout</h1>
-
-                <form action="{{ url_for('checkout') }}" method="POST">
-                    <!-- Delivery Address -->
-                    <div class="form-section">
-                        <h3>Delivery Address</h3>
-                        <label for="address" class="form-label">Street Address</label>
-                        <input type="text" class="form-control" id="address" name="address" required>
-                        
-                        <label for="city" class="form-label">City</label>
-                        <input type="text" class="form-control" id="city" name="city" required>
-                        
-                        <label for="state" class="form-label">State</label>
-                        <select name="state" id="state" class="form-control" required>
-                            <option value="" selected="selected">-- Select State --</option>
-                            {% for state in states %}
-                                <option value="{{ state }}">{{ state }}</option>
-                            {% endfor %}
-                        </select>
-
-                        <label for="zip_code" class="form-label">Zip Code</label>
-                        <input type="number" class="form-control" id="zip_code" name="zip_code" required>
-                    </div>
-
-                    <!-- Delivery Instructions -->
-                    <div class="form-section">
-                        <h3>Delivery Instructions</h3>
-                        <label for="delivery_instructions" class="form-label">Delivery Instructions</label>
-                        <input type="text" class="form-control" id="delivery_instructions" name="delivery_instructions">
-                    </div>
-
-                    <!-- Payment Methods -->
-                    <div class="form-section">
-                        <h3>Payment Methods</h3>
-                        <label for="card_num" class="form-label">Card Number</label>
-                        <input type="number" class="form-control" id="card_num" name="card_num" required>
-                        
-                        <label for="exp_date" class="form-label">Expiration Date (MM/YY)</label>
-                        <input type="number" class="form-control" id="exp_date" name="exp_date" required>
-
-                        <label for="cvv" class="form-label">CVV</label>
-                        <input type="number" class="form-control" id="cvv" name="cvv" required>
-
-                        <label for="billing_zip" class="form-label">Billing Zip Code</label>
-                        <input type="number" class="form-control" id="billing_zip" name="billing_zip" required>
-                    </div>
-                </form>                
-    </main>
 </body>
 </html>
