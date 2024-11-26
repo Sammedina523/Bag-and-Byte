@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order
-from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order
+from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order, get_cart_count
 from kroger import KrogerAPI
 from datetime import datetime
 
@@ -320,6 +319,14 @@ def confirm_order(order_id):
     # Optionally, send a success message and redirect to the orders page
     flash('Order confirmed successfully!', 'success')
     return redirect(url_for('orders'))
+
+@app.before_request
+def before_request():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        session['cart_count'] = get_cart_count(user_id)
+    else:
+        session['cart_count'] = 0
 
 @app.route('/reorder/<int:order_id>', methods=['POST'])
 def reorder(order_id):

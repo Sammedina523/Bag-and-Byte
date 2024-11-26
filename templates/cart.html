@@ -5,7 +5,6 @@
     <title>Shopping Cart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .cart-container {
@@ -87,10 +86,23 @@
             background-color: #218838;
         }
 
-        .clear-cart-button:hover {
-            background-color: #c82333;
+        .cart-count {
+            background-color: #dc3545;
+            color: white;
+            font-size: 12px;
+            border-radius: 50%;
+            padding: 3px 6px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
+            display: inline-block;
         }
 
+        .icon-container {
+            position: relative;
+            display: inline-block;
+        }
     </style>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -163,7 +175,14 @@
             <div class="right-icons">
                 {% if session.get('user_id') %}
                     <a href="{{ url_for('account') }}" class="icon-spacing"><i class="fas fa-user-circle"></i></a>
-                    <a href="{{ url_for('cart') }}" class="icon-spacing"><i class="fas fa-shopping-cart"></i></a>
+                    <div class="icon-container">
+                        <a href="{{ url_for('cart') }}" class="icon-spacing">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                        {% if session.get('cart_count', 0) > 0 %}
+                            <span class="cart-count">{{ session['cart_count'] }}</span>
+                        {% endif %}
+                    </div>
                     <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <div class="login-signup">
@@ -193,7 +212,6 @@
                         <div>
                             <input type="number" min="1" value="{{ item['quantity'] }}" onchange="updateCartItem('{{ item['name'] }}', this.value)">
                             <span class="remove-button" onclick="removeFromCart('{{ item['name'] }}')">Remove</span>
-                        
                         </div>
                     </div>
                 {% endfor %}
@@ -211,9 +229,9 @@
             <div style="height: 20px;"></div>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Continue Shopping</button></a>
             <div style="height: 20px;"></div>
-            <button class="btn btn-tertiary w-100" onclick="clearCart()">Clear Cart</button>
+            <button class="btn btn-danger w-100" onclick="clearCart()">Clear Cart</button>
 
-            {% else %}
+        {% else %}
             <p class="empty-message">Your cart wants a byte...</p>
             <p class="browse-message">Start browsing!</p>
             <a href="{{ url_for('profile') }}"><button class="btn btn-secondary w-100">Browse</button></a>

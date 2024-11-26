@@ -361,3 +361,13 @@ def get_order_by_id(order_id):
     
     return None  # If no order is found for the given order_id
 
+def get_cart_count(user_id):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT SUM(quantity) FROM cart WHERE user_id = ?
+    ''', (user_id,))
+    cart_count = cursor.fetchone()[0] or 0
+    conn.close()
+    return cart_count
+
