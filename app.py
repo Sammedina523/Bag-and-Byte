@@ -241,14 +241,13 @@ def process_checkout():
     card_num = request.form.get('card_num')
     exp_date = request.form.get('exp_date')
     cvv = request.form.get('cvv')
-    billing_zip = request.form.get('billing_zip')
 
     # Simple validation for required fields
     if not address or not city or not state or not zip_code:
         flash('Please fill in all required fields for delivery.', 'danger')
         return redirect(url_for('checkout'))
 
-    if not card_num or not exp_date or not cvv or not billing_zip:
+    if not card_num or not exp_date or not cvv:
         flash('Please provide valid payment information.', 'danger')
         return redirect(url_for('checkout'))
 
@@ -273,7 +272,7 @@ def process_checkout():
 
     # Flash a success message and redirect to the order confirmation page
     flash(f'Your order #{order_id} has been placed successfully!', 'success')
-    return render_template('profile.html')
+    return redirect(url_for('profile'))
 
 
 # Route to clear all items from the cart
@@ -299,6 +298,7 @@ def orders():
 
     return render_template('orders.html', orders=orders)
 
+# no longer using this function
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
 def confirm_order(order_id):
     # Fetch the order from the database using get_user_order_by_id
