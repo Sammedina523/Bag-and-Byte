@@ -9,13 +9,14 @@
     <title>Checkout | Bag & Byte</title>
     <style>
         .main-container {
-            display: flex; /* Flexbox to arrange items in a row */
-            justify-content: space-between; /* Ensures checkout form is on the left and cart is on the right */
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
             padding: 40px;
         }
 
         .checkout-form {
-            flex: 1; /* Take up available space */
+            flex: 1;
             min-width: 300px;
             max-width: 600px;
             background-color: #fff;
@@ -25,7 +26,7 @@
         }
 
         .cart-container {
-            flex: 1; /* Take up available space */
+            flex: 1;
             min-width: 300px;
             max-width: 600px;
             background-color: #fff;
@@ -34,7 +35,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .checkout-form h1, .cart-container h1 {
+        .checkout-form h1,
+        .cart-container h1 {
             margin-bottom: 20px;
             font-size: 24px;
         }
@@ -48,7 +50,8 @@
             font-size: 18px;
         }
 
-        .form-section input, .form-section select {
+        .form-section input,
+        .form-section select {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -64,22 +67,6 @@
         .btn-primary:hover {
             background-color: #218838;
             border-color: #1e7e34;
-        }
-
-        .back-to-cart {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .back-to-cart a {
-            color: #28a745;
-            text-decoration: none;
-            font-size: 16px;
-        }
-
-        .back-to-cart a:hover {
-            text-decoration: underline;
         }
 
         .cart-item {
@@ -109,10 +96,31 @@
             margin: 5px 0;
             font-weight: bold;
         }
+
+        .back-to-cart {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .back-to-cart a {
+            color: #28a745;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .back-to-cart a:hover {
+            text-decoration: underline;
+        }
+
+        .purchase-button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <!-- Flash messages for feedback -->
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -123,7 +131,8 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <!-- Header Section -->
+
+    <!-- Header -->
     <header>
         <div class="header">
             <div class="d-flex align-items-center">
@@ -137,21 +146,13 @@
             
             <div class="right-icons">
                 {% if session.get('user_id') %}
-                    <a href="{{ url_for('account') }}" class="icon-spacing">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                    <a href="{{ url_for('cart') }}" class="icon-spacing">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
+                    <a href="{{ url_for('account') }}" class="icon-spacing"><i class="fas fa-user-circle"></i></a>
+                    <a href="{{ url_for('cart') }}" class="icon-spacing"><i class="fas fa-shopping-cart"></i></a>
                     <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <div class="login-signup">
-                        <a href="{{ url_for('login') }}">
-                            <button class="login-btn">Login</button>
-                        </a>
-                        <a href="{{ url_for('register') }}">
-                            <button class="signup-btn">Sign Up</button>
-                        </a>
+                        <a href="{{ url_for('login') }}"><button class="login-btn">Login</button></a>
+                        <a href="{{ url_for('register') }}"><button class="signup-btn">Sign Up</button></a>
                     </div>
                 {% endif %}
                 <form class="search-bar" action="{{ url_for('search') }}" method="GET">
@@ -164,11 +165,10 @@
 
     <!-- Main Layout -->
     <div class="main-container">
-        <!-- Form Wrapper - Wrap the entire content here -->
-        <form action="{{ url_for('process_checkout') }}" method="POST">
-            <!-- Checkout Form -->
-            <div class="checkout-form">
-                <h1>Checkout</h1>
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+            <h1>Checkout</h1>
+            <form id= "checkout-form" action="{{ url_for('process_checkout') }}" method="POST" onsubmit="return validateForm()">
                 <div class="form-section">
                     <h3>Delivery Address</h3>
                     <label for="address">Street Address</label>
@@ -194,52 +194,52 @@
                     <label for="cvv">CVV</label>
                     <input type="text" id="cvv" name="cvv" required>
                 </div>
+            </form>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-container">
+            <h1>Your Order</h1>
+            <div id="cart-items">
+                {% for item in cart %}
+                    <div class="cart-item">
+                        <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}">
+                        <span>{{ item['name'] }} - ${{ '%.2f' % item['price'] }}</span>
+                    </div>
+                {% endfor %}
             </div>
-
-            <!-- Cart Summary -->
-            <div class="cart-container">
-                <h1>Your Order</h1>
-                <div id="cart-items">
-                    {% for item in cart %}
-                        <div class="cart-item">
-                            <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}">
-                            <span>{{ item['name'] }} - ${{ '%.2f' % item['price'] }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="total-section">
-                    {% set tax_rate = 0.0875 %}
-                    {% set tax_amount = total_price * tax_rate %}
-                    {% set final_total = total_price + tax_amount %}
-                    <p>Subtotal: ${{ '%.2f' % total_price }}</p>
-                    <p>Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
-                    <p>Total: ${{ '%.2f' % final_total }}</p>
-                </div>
-
-                <!-- Purchase Button (Inside the cart-container) -->
-                <button type="submit" class="btn btn-primary w-100">Purchase</button>
-
-                <div class="back-to-cart">
-                    <a href="{{ url_for('cart') }}">Back to Cart</a>
-                </div>
+            <div class="total-section">
+                {% set tax_rate = 0.0875 %}
+                {% set tax_amount = total_price * tax_rate %}
+                {% set final_total = total_price + tax_amount %}
+                <p>Subtotal: ${{ '%.2f' % total_price }}</p>
+                <p>Estimated Tax: ${{ '%.2f' % tax_amount }}</p>
+                <p>Total: ${{ '%.2f' % final_total }}</p>
             </div>
-        </form>
+            <div class="back-to-cart">
+                <a href="{{ url_for('cart') }}">Back to Cart</a>
+            </div>
+            <div class="purchase-button-container">
+                <button type="submit" class="btn btn-primary" form="checkout-form">Purchase</button>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Automatically hide the flash messages after 3 seconds
+        // Auto-hide flash messages
         document.addEventListener('DOMContentLoaded', function () {
-            const flashMessages = document.querySelectorAll('.alert'); // Select all flash messages
+            const flashMessages = document.querySelectorAll('.alert');
             flashMessages.forEach(function (flashMessage) {
-                setTimeout(function() {
-                    const alert = new bootstrap.Alert(flashMessage); 
-                    alert.close(); // Close the alert after 3 seconds
+                setTimeout(function () {
+                    const alert = new bootstrap.Alert(flashMessage);
+                    alert.close();
                 }, 3000);
             });
         });
     </script>
 </body>
 </html>
+
