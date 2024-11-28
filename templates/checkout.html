@@ -15,7 +15,7 @@
             padding: 40px;
         }
 
-        .checkout-form {
+        .checkout-form, .cart-container {
             flex: 1;
             min-width: 300px;
             max-width: 600px;
@@ -25,18 +25,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .cart-container {
-            flex: 1;
-            min-width: 300px;
-            max-width: 600px;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .checkout-form h1,
-        .cart-container h1 {
+        .checkout-form h1, .cart-container h1 {
             margin-bottom: 20px;
             font-size: 24px;
         }
@@ -45,28 +34,12 @@
             margin-bottom: 20px;
         }
 
-        .form-section h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .form-section input,
-        .form-section select {
+        .form-section input, .form-section select {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 4px;
             border: 1px solid #ddd;
-        }
-
-        .btn-primary {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-primary:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
         }
 
         .cart-item {
@@ -80,11 +53,6 @@
             width: 60px;
             height: auto;
             margin-right: 10px;
-        }
-
-        .cart-item span {
-            flex-grow: 1;
-            text-align: left;
         }
 
         .total-section {
@@ -109,8 +77,24 @@
             font-size: 16px;
         }
 
-        .back-to-cart a:hover {
-            text-decoration: underline;
+        .icon-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            line-height: 18px;
+            border-radius: 50%;
         }
 
         .purchase-button-container {
@@ -147,7 +131,12 @@
             <div class="right-icons">
                 {% if session.get('user_id') %}
                     <a href="{{ url_for('account') }}" class="icon-spacing"><i class="fas fa-user-circle"></i></a>
-                    <a href="{{ url_for('cart') }}" class="icon-spacing"><i class="fas fa-shopping-cart"></i></a>
+                    <div class="icon-container">
+                        <a href="{{ url_for('cart') }}" class="icon-spacing"><i class="fas fa-shopping-cart"></i></a>
+                        {% if session.get('cart_count', 0) > 0 %}
+                            <span class="cart-count">{{ session['cart_count'] }}</span>
+                        {% endif %}
+                    </div>
                     <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <div class="login-signup">
@@ -168,7 +157,7 @@
         <!-- Checkout Form -->
         <div class="checkout-form">
             <h1>Checkout</h1>
-            <form id= "checkout-form" action="{{ url_for('process_checkout') }}" method="POST" onsubmit="return validateForm()">
+            <form id="checkout-form" action="{{ url_for('process_checkout') }}" method="POST" onsubmit="return validateForm()">
                 <div class="form-section">
                     <h3>Delivery Address</h3>
                     <label for="address">Street Address</label>
@@ -242,4 +231,3 @@
     </script>
 </body>
 </html>
-

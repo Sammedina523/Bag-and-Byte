@@ -33,6 +33,24 @@
         .logout-btn:hover {
             background-color: #c82333;
         }
+        .icon-container {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            line-height: 18px;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -54,9 +72,14 @@
                     <a href="{{ url_for('account') }}" class="icon-spacing">
                         <i class="fas fa-user-circle"></i>
                     </a>
-                    <a href="{{ url_for('cart') }}" class="icon-spacing">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
+                    <div class="icon-container">
+                        <a href="{{ url_for('cart') }}" class="icon-spacing">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                        {% if session.get('cart_count', 0) > 0 %}
+                            <span class="cart-count">{{ session['cart_count'] }}</span>
+                        {% endif %}
+                    </div>
                     <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <!-- If user is not logged in, show login and signup buttons -->

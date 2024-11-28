@@ -61,7 +61,27 @@
         .add-to-cart-btn:hover {
             background-color: #218838;
         }
-        
+
+        /* Styling the cart icon and count */
+        .icon-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            line-height: 18px;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +97,7 @@
         {% endif %}
     {% endwith %}
 
-   <!-- Header Section -->
+    <!-- Header Section -->
     <header>
         <div class="header">
             <div class="d-flex align-items-center">
@@ -95,9 +115,14 @@
                     <a href="{{ url_for('account') }}" class="icon-spacing">
                         <i class="fas fa-user-circle"></i>
                     </a>
-                    <a href="{{ url_for('cart') }}" class="icon-spacing">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
+                    <div class="icon-container">
+                        <a href="{{ url_for('cart') }}" class="icon-spacing">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                        {% if session.get('cart_count', 0) > 0 %}
+                            <span class="cart-count">{{ session['cart_count'] }}</span>
+                        {% endif %}
+                    </div>
                     <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
                     <!-- If user is not logged in, show login and signup buttons -->
@@ -119,7 +144,6 @@
         </div>
     </header>
 
-
     <div class="container mt-4">
         <h2>Search Results for "{{ query }}"</h2>
 
@@ -140,47 +164,31 @@
             <p>No products found for "{{ query }}"</p>
         {% endif %}
     </div>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
-
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // JavaScript function to handle adding items to the cart
-        async function addToCart(productId, quantity) {
+        async function addToCart(productId) {
             const response = await fetch('/add_to_cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ product_id: productId, quantity: quantity })
+                    body: JSON.stringify({ product_id: productId, quantity: 1 })
                 });
                 if (response.ok) {
-                    // If the response is successful, you can handle success response
                     const data = await response.json();
-                    // Optional: You might want to show a success message here or update UI accordingly
                     console.log(data.message);
-                    location.reload();  // Reload to update the cart view
+                    location.reload();
                 } else if (response.status === 401) {
-                    // If the user is not logged in, redirect to the login page
                     window.location.href = '/login';
                 } else {
-                    // Handle other errors as needed
                     const errorData = await response.json();
-                    console.error(errorData.error); // Log or display the error message
+                    console.error(errorData.error);
                 }
         }
-        // Automatically hide the flash messages after 3 seconds
-        document.addEventListener('DOMContentLoaded', function () {
-            const flashMessages = document.querySelectorAll('.alert'); // Select all flash messages
-            flashMessages.forEach(function (flashMessage) {
-                setTimeout(function() {
-                    const alert = new bootstrap.Alert(flashMessage); // Use Bootstrap's JavaScript to hide
-                    alert.close();
-                }, 3000); // Hide the message after 3 seconds
-            });
-        });
     </script>
 </body>
 </html>

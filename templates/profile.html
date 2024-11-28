@@ -28,7 +28,6 @@
             color: #28a745;
         }
 
-        /* Flex container for horizontal layout with wrapping */
         .products-list {
             display: flex;
             flex-wrap: wrap;
@@ -37,7 +36,6 @@
             padding: 20px;
         }
 
-        /* Style for each product card */
         .product {
             background-color: #fff;
             border: 1px solid #ddd;
@@ -47,7 +45,6 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            color: inherit;
         }
 
         .product a {
@@ -80,45 +77,25 @@
             background-color: #218838;
         }
 
-        /* Header styling */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
+        .icon-container {
+            position: relative;
+            display: inline-block;
         }
 
-        .right-icons {
-            margin-left: auto;
-        }
-
-        .right-icons a {
-            font-size: 24px;
-            color: inherit;
-            margin-left: 15px;
-        }
-
-        /* Flash message styling */
-        .flash-message {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #01ac20;
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
             color: white;
-            padding: 15px 30px;
-            border-radius: 5px;
-            font-size: 16px;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 1s ease-out;
+            font-size: 12px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            line-height: 18px;
+            border-radius: 50%;
         }
-
-        .flash-message.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
     </style>
 </head>
 <body>
@@ -147,16 +124,19 @@
             
             <div class="right-icons">
                 {% if session.get('user_id') %}
-                    <!-- If user is logged in, show account and cart icons -->
                     <a href="{{ url_for('account') }}" class="icon-spacing">
                         <i class="fas fa-user-circle"></i>
                     </a>
-                    <a href="{{ url_for('cart') }}" class="icon-spacing">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
+                    <div class="icon-container">
+                        <a href="{{ url_for('cart') }}" class="icon-spacing">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                        {% if session.get('cart_count', 0) > 0 %}
+                            <span class="cart-count">{{ session['cart_count'] }}</span>
+                        {% endif %}
+                    </div>
                     <a href="{{ url_for('orders') }}" class="icon-spacing"><i class="fas fa-box"></i></a>
                 {% else %}
-                    <!-- If user is not logged in, show login and signup buttons -->
                     <div class="login-signup">
                         <a href="{{ url_for('login') }}">
                             <button class="login-btn">Login</button>
@@ -226,18 +206,6 @@
             const data = await response.json();
             location.reload();  // Reload to update the cart view
         }
-
-
-        // Automatically hide the flash messages after 3 seconds
-        document.addEventListener('DOMContentLoaded', function () {
-            const flashMessages = document.querySelectorAll('.alert'); // Select all flash messages
-            flashMessages.forEach(function (flashMessage) {
-                setTimeout(function() {
-                    const alert = new bootstrap.Alert(flashMessage); // Use Bootstrap's JavaScript to hide
-                    alert.close();
-                }, 3000); // Hide the message after 3 seconds
-            });
-        });
     </script> 
     {% include 'footer.html' %}
 </body>
