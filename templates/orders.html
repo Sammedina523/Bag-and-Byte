@@ -69,7 +69,7 @@
                         <div class="list-group-item {% if order.order_status == 'pending' %}order-pending{% else %}order-completed{% endif %}">
                             <h5>Order ID: {{ order.order_id }} ({{ order.order_status }})</h5>
                             <p><strong>Order Date:</strong> {{ order.order_date|to_12_hour }}</p>
-                            <p><strong>Total Price:</strong> ${{ order.total_price|round(2) }}</p>
+                            <p><strong>Total Price:</strong> ${{ "%.2f" | format(order.total_price) }}</p>
 
                             <h6>Items:</h6>
 

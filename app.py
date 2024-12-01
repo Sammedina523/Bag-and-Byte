@@ -1,10 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_mail import Mail, Message
 from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order, get_cart_count
 from kroger import KrogerAPI
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'bagandbyte@gmail.com'  # Your email address
+app.config['MAIL_PASSWORD'] = 'swbcyovjayqxreyw'  # App password (not your actual Gmail password)
+app.config['MAIL_DEFAULT_SENDER'] = 'bagandbyte@gmail.com'
+
+mail = Mail(app)
 
 
 @app.route('/search')
@@ -267,12 +277,50 @@ def process_checkout():
         payment_status='Paid'  # In a real application, you'd verify payment through a gateway
     )
 
+    # Send email confirmation
+    try:
+        # Retrieve user's email (assuming user_id is the email)
+        recipient_email = user_id
+
+        # Create the order summary
+        order_summary = '\n'.join([f"{item['name']} (x{item['quantity']}): ${item['price'] * item['quantity']:.2f}" for item in cart_items])
+
+        # Email message body
+        email_body = f"""
+        Thank you for your purchase!
+
+        Order ID: {order_id}
+        Total Price (including tax): ${total_price:.2f}
+        
+        Delivery Address:
+        {address}, {city}, {state}, {zip_code}
+
+        Items:
+        {order_summary}
+
+        Your order is being processed and will be sent to you soon.
+        Best regards, Bag & Byte Team
+        """
+
+        # Send the email
+        msg = Message(
+            subject="Order Confirmation - Bag & Byte",
+            sender="bagandbyte@gmail.com",
+            recipients=[recipient_email],
+            body=email_body
+        )
+        mail.send(msg)
+        flash(f'Order confirmation email sent to {recipient_email}.', 'success')
+    except Exception as e:
+        flash(f"Failed to send order confirmation email: {str(e)}", "danger")
+
     # Clear the cart after order placement
     clear_cart_db(user_id)
 
     # Flash a success message and redirect to the order confirmation page
     flash(f'Your order #{order_id} has been placed successfully!', 'success')
     return redirect(url_for('profile'))
+
 
 
 # Route to clear all items from the cart
@@ -354,4 +402,4 @@ def reorder(order_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True) 
