@@ -156,7 +156,11 @@
                         </a>
                         <div class="product-title">{{ product['name'] }}</div>
                         <div class="product-price">${{ product['price'] }}</div>
-                        <button class="btn add-to-cart-btn" onclick="addToCart('{{ product['product_id'] }}')">Add to Cart</button>
+                        {% if product['price'] %}
+                            <button class="add-to-cart-btn" onclick="addToCart('{{ product['product_id'] }}', 1)">Add to Cart</button>
+                        {% else %}
+                            <!-- Do not display the button if price is not available -->
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
