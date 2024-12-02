@@ -282,34 +282,47 @@ def process_checkout():
         # Retrieve user's email (assuming user_id is the email)
         recipient_email = user_id
 
-        # Create the order summary
-        order_summary = '\n'.join([f"{item['name']} (x{item['quantity']}): ${item['price'] * item['quantity']:.2f}" for item in cart_items])
+       # Create the order summary with HTML for better formatting and images
+        order_summary = ''.join([
+            f"""
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <img src="{item['image_url']}" alt="{item['name']}" style="width: 80px; height: 80px; margin-right: 15px; border: 1px solid #ddd; border-radius: 8px;">
+                <div>
+                    <p style="margin: 0; font-weight: bold;">{item['name']} (x{item['quantity']})</p>
+                    <p style="margin: 0;">Price: ${item['price'] * item['quantity']:.2f}</p>
+                </div>
+            </div>
+            """
+            for item in cart_items
+        ])
 
-        # Email message body
+        # Email message body 
         email_body = f"""
-        Thank you for your purchase!
-
-        Order ID: {order_id}
-        Total Price (including tax): ${total_price:.2f}
-        
-        Delivery Address:
-        {address}, {city}, {state}, {zip_code}
-
-        Items:
-        {order_summary}
-
-        Your order is being processed and will be sent to you soon.
-        Best regards, Bag & Byte Team
+        <div style="font-family: Arial, sans-serif; color: #000000; line-height: 1.6;">
+            <h2>Thank you for your purchase!</h2>
+            <p><strong>Order ID:</strong> {order_id}</p>
+            <p><strong>Total Price (including tax):</strong> ${total_price:.2f}</p>
+            <h3>Delivery Address:</h3>
+            <p>{address}, {city}, {state}, {zip_code}</p>
+            <h3>Items:</h3>
+            {order_summary}
+            <p>Your order is being processed and will be sent to you soon.</p>
+            <p>Best regards, <br>Bag & Byte Team</p>
+        </div>
         """
 
         # Send the email
         msg = Message(
             subject="Order Confirmation - Bag & Byte",
             sender="bagandbyte@gmail.com",
-            recipients=[recipient_email],
-            body=email_body
+            recipients=[recipient_email]
         )
+        msg.html = email_body
+
+        # Send the email
         mail.send(msg)
+
+
         flash(f'Order confirmation email sent to {recipient_email}.', 'success')
     except Exception as e:
         flash(f"Failed to send order confirmation email: {str(e)}", "danger")
