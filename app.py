@@ -3,6 +3,7 @@ from flask_mail import Mail, Message
 from database import add_user, get_user, verify_password, add_to_cart_db, update_cart_item, delete_cart_item, get_cart, get_products, get_categories, get_product_by_id, get_suggested_products, get_products_by_query, clear_cart_db, get_user_orders, get_order_by_id, update_order_status, place_order, get_cart_count
 from kroger import KrogerAPI
 from datetime import datetime
+from pytz import timezone, UTC
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for flash messages
@@ -228,8 +229,18 @@ def checkout():
 @app.template_filter('to_12_hour')
 def to_12_hour(value):
     try:
-        # Convert string to datetime and format to 12-hour time
-        return datetime.strptime(value, '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y %I:%M:%S %p')
+        # Define Eastern Time Zone
+        eastern = timezone('US/Eastern')
+
+        # Parse the UTC datetime string into a datetime object
+        utc_time = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+
+        # Localize the datetime to UTC, then convert to Eastern Time
+        utc_time = UTC.localize(utc_time)
+        eastern_time = utc_time.astimezone(eastern)
+
+        # Format the datetime in 12-hour format
+        return eastern_time.strftime('%m/%d/%Y %I:%M:%S %p')
     except (ValueError, TypeError):
         return "Invalid Date"
 

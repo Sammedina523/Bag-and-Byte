@@ -8,20 +8,40 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom order status styles */
-        .order-pending {
-            background-color: #e7f5ff; /* Light blue */
-            border-left: 5px solid #007bff; /* Blue border for pending */
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
+
+        .order-item img {
+            width: 80px;
+            height: 80px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .order-item-details {
+            flex-grow: 1;
+        }
+
+        .order-pending {
+            background-color: #e7f5ff;
+            border-left: 5px solid #007bff;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
         .order-completed {
-            background-color: #e9f7e3; /* Light green */
-            border-left: 5px solid #28a745; /* Green border for completed */
+            background-color: #e9f7e3;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    
-    <!-- Header Section -->
     <header>
         <div class="header">
             <div class="d-flex align-items-center">
@@ -32,7 +52,6 @@
                 </div>
                 <div class="logo-text">BAG & BYTE</div>
             </div>
-            
             <div class="right-icons">
                 {% if session.get('user_id') %}
                     <a href="{{ url_for('account') }}" class="icon-spacing"><i class="fas fa-user-circle"></i></a>
@@ -48,7 +67,6 @@
                         </a>
                     </div>
                 {% endif %}
-                
                 <form class="search-bar" action="{{ url_for('search') }}" method="GET">
                     <input type="text" name="query" placeholder="Search for products..." required>
                     <button type="submit"><i class="fas fa-search"></i></button>
@@ -57,31 +75,39 @@
         </div>
     </header>
 
-    <!-- Main Orders Section -->
     <main>
         <div class="checkout-form">
-            <div style="height: 20px;"></div>
             <h1>Your Past Orders</h1>
 
             {% if orders %}
                 <div class="list-group mt-4">
                     {% for order in orders %}
-                        <div class="list-group-item {% if order.order_status == 'pending' %}order-pending{% else %}order-completed{% endif %}">
-                            <h5>Order ID: {{ order.order_id }} ({{ order.order_status }})</h5>
-                            <p><strong>Order Date:</strong> {{ order.order_date|to_12_hour }}</p>
-                            <p><strong>Total Price:</strong> ${{ "%.2f" | format(order.total_price) }}</p>
+                        <div class="list-group-item {% if order['order_status'] == 'pending' %}order-pending{% else %}order-completed{% endif %}">
+                            <h5>Order ID: {{ order['order_id'] }} ({{ order['order_status'] }})</h5>
+                            <p><strong>Order Date:</strong> {{ order['order_date']|to_12_hour }}</p>
+                            <p><strong>Total Price:</strong> ${{ "%.2f" | format(order['total_price']) }}</p>
 
                             <h6>Items:</h6>
+                            <div>
+                                {% for item in order['items'] %}
+                                    <div class="order-item">
+                                        <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}">
+                                        <div class="order-item-details">
+                                            <p><strong>{{ item['name'] }}</strong></p>
+                                            <p>Quantity: {{ item['quantity'] }}</p>
+                                            <p>Price: ${{ "%.2f" | format(item['price'] * item['quantity']) }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
 
                             <div class="mt-3">
-                                {% if order.order_status == 'pending' %}
-                                    <!-- Confirm Button for Pending Orders -->
-                                    <form action="{{ url_for('confirm_order', order_id=order.order_id) }}" method="POST" style="display:inline;">
+                                {% if order['order_status'] == 'pending' %}
+                                    <form action="{{ url_for('confirm_order', order_id=order['order_id']) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="btn btn-primary">Confirm Order</button>
                                     </form>
-                                {% elif order.order_status == 'completed' %}
-                                    <!-- Reorder Button for Completed Orders -->
-                                    <form action="{{ url_for('reorder', order_id=order.order_id) }}" method="POST" style="display:inline;">
+                                {% elif order['order_status'] == 'completed' %}
+                                    <form action="{{ url_for('reorder', order_id=order['order_id']) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="btn btn-success">Reorder</button>
                                     </form>
                                 {% endif %}
@@ -95,8 +121,6 @@
         </div>
     </main>
 
-    <!-- Footer Section -->
-    <div style="height: px;"></div>
     {% include 'footer.html' %}
 </body>
 </html>
